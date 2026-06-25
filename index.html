@@ -10,11 +10,17 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    html, body {
+    html {
+      margin: 0;
+      padding: 0;
+      overflow-x: clip; /* clip doesn't create a scroll container — sticky stays intact */
+    }
+
+    body {
       margin: 0;
       padding: 0;
       background: #0a0a0a;
-      overflow-x: hidden;
+      /* NO overflow-x here — overflow on body breaks position:sticky in all browsers */
     }
 
     @keyframes pulseGlow {
@@ -28,17 +34,20 @@
     #stickyFrame {
       position: sticky;
       top: 0;
-      width: 100vw;
+      left: 0;
+      width: 100%;
       height: 100vh;
       overflow: hidden;
+      background: #000;
     }
 
     #scrollVideo {
       position: absolute;
-      inset: 0;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center center;
       display: block;
     }
 
@@ -47,12 +56,13 @@
       inset: 0;
       background: linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,.15) 50%, rgba(0,0,0,.5) 100%);
       pointer-events: none;
+      z-index: 2;
     }
 
     #heroOverlay {
       position: absolute;
       inset: 0;
-      z-index: 2;
+      z-index: 3;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -160,7 +170,13 @@
 <div id="videoSection">
   <div id="stickyFrame">
 
-    <video id="scrollVideo" muted playsinline preload="auto">
+    <!-- Poster image — visible before video loads and stays fixed throughout -->
+    <img id="heroPoster"
+         src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1920&q=85&fit=crop"
+         alt=""
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0;">
+
+    <video id="scrollVideo" muted playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1;">
       <source src="Hambi.mp4" type="video/mp4">
     </video>
 
