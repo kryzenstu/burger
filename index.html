@@ -13,18 +13,18 @@
     html {
       margin: 0;
       padding: 0;
-      overflow-x: clip; /* doesn't create a scroll container — sticky stays intact */
+      overflow-x: clip; /* clip ≠ hidden: doesn't create a scroll container, sticky still works */
     }
 
     body {
       margin: 0;
       padding: 0;
       background: #0a0a0a;
-      overflow-x: hidden; /* belt-and-suspenders: body overflow:hidden is safe when html already clips */
+      /* overflow-x MUST stay unset on body — hidden/clip on body breaks position:sticky */
     }
 
-    /* Prevent any child from causing horizontal scroll */
-    #videoSection, #scrollContainer { overflow-x: hidden; }
+    /* Safe to clip here: no sticky elements live inside #scrollContainer */
+    #scrollContainer { overflow-x: hidden; }
 
     @keyframes pulseGlow {
       0%, 100% { opacity: 0.45; }
