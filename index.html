@@ -13,15 +13,18 @@
     html {
       margin: 0;
       padding: 0;
-      overflow-x: clip; /* clip doesn't create a scroll container — sticky stays intact */
+      overflow-x: clip; /* doesn't create a scroll container — sticky stays intact */
     }
 
     body {
       margin: 0;
       padding: 0;
       background: #0a0a0a;
-      /* NO overflow-x here — overflow on body breaks position:sticky in all browsers */
+      overflow-x: hidden; /* belt-and-suspenders: body overflow:hidden is safe when html already clips */
     }
+
+    /* Prevent any child from causing horizontal scroll */
+    #videoSection, #scrollContainer { overflow-x: hidden; }
 
     @keyframes pulseGlow {
       0%, 100% { opacity: 0.45; }
@@ -165,20 +168,20 @@
 
     /* ── Mobile / iPhone optimizations ── */
     @media (max-width: 767px) {
-      /* Less scrolling distance for the video section on mobile */
+      /* Less scrolling distance on mobile */
       #videoSpacer { height: 220vh; }
 
-      /* Hero heading: allow smaller so it fits phone screens */
+      /* Hero heading: smaller clamp minimum for narrow screens */
       #heroOverlay h1 { font-size: clamp(44px, 14vw, 80px) !important; }
 
-      /* Badge: tighter padding and letter-spacing so it doesn't overflow */
+      /* Badge: tighter so it doesn't overflow */
       #heroBadge {
         font-size: 11px !important;
         letter-spacing: 3px !important;
         padding: 6px 14px !important;
       }
 
-      /* Overlay: less side padding on small screens */
+      /* Overlay padding */
       #heroOverlay { padding: 20px 18px !important; }
 
       /* Subtitle */
@@ -187,8 +190,55 @@
       /* Scroll hint: sit above iPhone home indicator */
       #scrollHint { bottom: max(20px, env(safe-area-inset-bottom, 20px)); }
 
-      /* Slightly thicker progress bar — easier to see on phone */
+      /* Progress bar slightly thicker */
       #videoProgress { height: 4px; }
+
+      /* ── Fix horizontal overflow causes ── */
+
+      /* Stats row (12 / 100% / 0): wrap to column so it doesn't spill off screen */
+      .story-stats {
+        flex-direction: column !important;
+        gap: 20px !important;
+        flex-wrap: wrap;
+      }
+
+      /* Story text padding: tighter on phones */
+      .story-grid > div:last-child {
+        padding: 40px 24px !important;
+      }
+
+      /* Menu section padding */
+      .reveal[style*="padding"] {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+
+      /* Process grid: ensure single column */
+      .process-grid {
+        grid-template-columns: 1fr !important;
+        gap: 32px !important;
+      }
+
+      /* Quote section padding */
+      .reveal[style*="80px 40px"] {
+        padding: 60px 20px !important;
+      }
+
+      /* CTA section text area padding */
+      .cta-grid > div:last-child {
+        padding: 40px 24px !important;
+      }
+
+      /* Buttons: full width on mobile */
+      .cta-grid a {
+        max-width: 100% !important;
+        text-align: center;
+      }
+
+      /* Footer: smaller padding */
+      #scrollContainer > div:last-child {
+        padding: 24px 20px !important;
+      }
     }
   </style>
 </head>
@@ -259,7 +309,7 @@
       <p style="font-family:'Libre Baskerville',serif;font-size:clamp(14px,1.4vw,17px);color:rgba(255,255,255,.7);line-height:1.9;margin:0;max-width:420px;">
         Minden pattyünket friss, 80/20 arányú magyar marhából készítjük, kézi smash technikával. A brisket 12 órán át füstölődik hickory fán — nem egy perccel kevesebbet.
       </p>
-      <div style="display:flex;gap:48px;margin-top:48px;padding-top:40px;border-top:1px solid rgba(255,255,255,.08);">
+      <div class="story-stats" style="display:flex;gap:48px;margin-top:48px;padding-top:40px;border-top:1px solid rgba(255,255,255,.08);">
         <div>
           <div style="font-family:'Anton',sans-serif;font-size:52px;color:#FF4500;line-height:1;">12</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.45);letter-spacing:2px;margin-top:4px;">ÓRA FÜSTÖLÉS</div>
