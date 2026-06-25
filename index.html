@@ -1,391 +1,470 @@
 <!DOCTYPE html>
-<html>
+<html lang="hu">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smoke &amp; Grill — Budapest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #0a0a0a;
+      overflow-x: hidden;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.45; }
+      50%       { opacity: 0.9; }
+    }
+
+    /* ── Video hero ── */
+    #videoSection { position: relative; }
+
+    #stickyFrame {
+      position: sticky;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #scrollVideo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #gradientOverlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,.15) 50%, rgba(0,0,0,.5) 100%);
+      pointer-events: none;
+    }
+
+    #heroOverlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+      background: linear-gradient(to top, rgba(0,0,0,.7) 0%, rgba(0,0,0,.2) 60%, transparent 100%);
+    }
+
+    #heroOverlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #scrollHint {
+      position: absolute;
+      bottom: 40px;
+      left: 0; right: 0;
+      text-align: center;
+      z-index: 3;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+
+    #videoProgress {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 3px;
+      background: #FF4500;
+      width: 0%;
+      z-index: 4;
+    }
+
+    #videoSpacer { height: 400vh; }
+
+    /* ── Content ── */
+    #scrollContainer { background: #0a0a0a; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity .8s ease, transform .8s ease;
+    }
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+      align-items: stretch;
+    }
+    @media (max-width: 768px) {
+      .story-grid { grid-template-columns: 1fr; }
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 360px;
+      gap: 2px;
+    }
+    @media (max-width: 768px) {
+      .gallery-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .gallery-grid > div { height: 56vw; }
+    }
+
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 48px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 70vh;
+      align-items: stretch;
+    }
+    @media (max-width: 768px) {
+      .cta-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-<x-dc>
 
-<helmet>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
-  <style>
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(60px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pulseGlow {
-      0%, 100% { text-shadow: 0 0 20px rgba(255,69,0,0.3), 0 0 40px rgba(255,69,0,0.1); }
-      50% { text-shadow: 0 0 30px rgba(255,69,0,0.5), 0 0 60px rgba(255,69,0,0.2); }
-    }
-    html, body { margin: 0; padding: 0; overflow-x: hidden; }
-    body { background: #0a0a0a; }
-    * { box-sizing: border-box; }
-  </style>
-  <script>
-    (function () {
-      function waitFor(id, cb, n) {
-        var el = document.getElementById(id);
-        if (el) { cb(el); return; }
-        if ((n || 0) > 100) return;
-        setTimeout(function () { waitFor(id, cb, (n || 0) + 1); }, 50);
-      }
+<!-- ══════════════════════════════════════
+     SCROLL-DRIVEN VIDEO HERO
+══════════════════════════════════════ -->
+<div id="videoSection">
+  <div id="stickyFrame">
 
-      // Lerp factor: how fast displayedTime chases targetTime each frame.
-      // Lower = smoother/more lag (try 0.05). Higher = snappier/more jumpy (try 0.2).
-      var LERP_FACTOR = 0.1;
-
-      function setup(video) {
-        video.pause();
-
-        var section = null, spacer = null, bar = null, hint = null, arrow = null, hero = null;
-
-        function getEls() {
-          section = document.getElementById('videoSection');
-          spacer  = document.getElementById('videoSpacer');
-          bar     = document.getElementById('videoProgress');
-          hint    = document.getElementById('scrollHint');
-          arrow   = document.getElementById('scrollArrow');
-          hero    = document.getElementById('heroOverlay');
-        }
-
-        var targetTime    = 0; // where scroll says the video should be
-        var displayedTime = 0; // where the video actually is (lerped)
-        var rafId         = null;
-
-        // Reads scroll position and updates targetTime + UI state.
-        // Does NOT touch video.currentTime — the RAF loop does that.
-        function readScroll() {
-          if (!section || !spacer) { getEls(); if (!section) return; }
-          var scrollTop = document.body.scrollTop;
-          var sectionTop = section.offsetTop;
-          var spacerH = spacer.offsetHeight;
-          var frac = Math.min(Math.max((scrollTop - sectionTop) / spacerH, 0), 1);
-          targetTime = frac * (video.duration || 0);
-
-          if (bar) bar.style.width = (frac * 100) + '%';
-
-          // Hero fades IN at the END of the scroll (frac 0.85 → 1.0)
-          if (hero) {
-            var heroOpacity = frac >= 0.85 ? Math.min(1, (frac - 0.85) / 0.15) : 0;
-            hero.style.opacity = heroOpacity;
-            hero.style.pointerEvents = heroOpacity > 0.5 ? 'auto' : 'none';
-          }
-
-          if (hint)  hint.style.opacity  = frac > 0.03 ? '0' : '1';
-          if (arrow) arrow.style.opacity = frac > 0.03 ? '0' : '1';
-        }
-
-        // Continuous RAF loop: lerps displayedTime toward targetTime every frame,
-        // so the video keeps catching up even after the user stops scrolling.
-        function rafLoop() {
-          displayedTime += (targetTime - displayedTime) * LERP_FACTOR;
-
-          // Only seek if the change is large enough to matter visually
-          if (Math.abs(video.currentTime - displayedTime) > 0.008) {
-            video.currentTime = displayedTime;
-          }
-
-          rafId = requestAnimationFrame(rafLoop);
-        }
-
-        function onScrollEvent() {
-          readScroll();
-        }
-
-        function onMeta() {
-          getEls();
-          readScroll();
-          // Attach to body — that's where scroll events fire on this page.
-          document.body.addEventListener('scroll', onScrollEvent, { passive: true });
-          // Start the lerp loop — runs every frame until the page unloads.
-          rafId = requestAnimationFrame(rafLoop);
-        }
-
-        if (video.readyState >= 1) {
-          onMeta();
-        } else {
-          video.addEventListener('loadedmetadata', onMeta, { once: true });
-          video.load();
-        }
-      }
-
-      waitFor('scrollVideo', setup);
-    })();
-  </script>
-</helmet>
-
-<!-- Scroll-driven video section -->
-<div id="videoSection" style="position: relative;">
-  <div style="position: sticky; top: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: 1;">
-    <video
-      id="scrollVideo"
-      muted=""
-      playsinline=""
-      preload="auto"
-      style="width: 100%; height: 100%; object-fit: cover; display: block;"
-    >
-      <source src="hambi.mp4" type="video/mp4" />
+    <video id="scrollVideo" muted playsinline preload="auto">
+      <source src="Hambi.mp4" type="video/mp4">
     </video>
 
-    <!-- Dark gradient overlay -->
-    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.5) 100%); z-index: 1; pointer-events: none;"></div>
+    <div id="gradientOverlay"></div>
 
-    <!-- Hero overlay — hidden at start, fades IN when video ends (frac ≥ 0.85) -->
-    <div id="heroOverlay" style="position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);">
-      <div style="margin-bottom: 24px;">
-        <div style="display: inline-block; border: 2px solid rgba(255,200,60,0.75); padding: 8px 28px; letter-spacing: 6px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: rgba(255,200,60,0.95); text-transform: uppercase;">Est. 2024 • Budapest</div>
+    <div id="heroOverlay">
+      <div style="margin-bottom:24px;">
+        <div style="display:inline-block;border:2px solid rgba(255,200,60,.75);padding:8px 28px;letter-spacing:6px;font-family:'Bebas Neue',sans-serif;font-size:16px;color:rgba(255,200,60,.95);text-transform:uppercase;">Est. 2024 • Budapest</div>
       </div>
-      <h1 style="font-family: 'Anton', sans-serif; font-size: clamp(64px, 12vw, 160px); color: #fff; margin: 0; line-height: 0.9; text-transform: uppercase; letter-spacing: -2px; text-shadow: 0 4px 40px rgba(0,0,0,0.8);">
-        Smoke<br />&amp; Grill
+      <h1 style="font-family:'Anton',sans-serif;font-size:clamp(64px,12vw,160px);color:#fff;margin:0;line-height:.9;text-transform:uppercase;letter-spacing:-2px;text-shadow:0 4px 40px rgba(0,0,0,.8);">
+        Smoke<br>&amp; Grill
       </h1>
-      <div style="width: 80px; height: 3px; background: #FF4500; margin: 28px auto;"></div>
-      <p style="font-family: 'Libre Baskerville', serif; font-size: clamp(15px, 2vw, 22px); color: rgba(255,255,255,0.9); max-width: 500px; margin: 0 auto 36px auto; line-height: 1.6; font-style: italic; text-shadow: 0 2px 12px rgba(0,0,0,0.6);">
+      <div style="width:80px;height:3px;background:#FF4500;margin:28px auto;"></div>
+      <p style="font-family:'Libre Baskerville',serif;font-size:clamp(15px,2vw,22px);color:rgba(255,255,255,.9);max-width:500px;margin:0 auto 36px;line-height:1.6;font-style:italic;text-shadow:0 2px 12px rgba(0,0,0,.6);">
         Kézműves hamburgerek, füstölt ízek, amerikai lélek.
       </p>
-      <a href="#scrollContainer" style="font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px; color: #fff; background: #FF4500; padding: 16px 44px; text-decoration: none; border: none; cursor: pointer;">FEDEZD FEL ↓</a>
+      <a href="#scrollContainer" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:#fff;background:#FF4500;padding:16px 44px;text-decoration:none;">FEDEZD FEL ↓</a>
     </div>
 
-    <!-- Scroll hint — fades out when scrolling starts -->
-    <div style="position: absolute; bottom: 40px; left: 0; right: 0; text-align: center; z-index: 3; pointer-events: none;">
-      <div id="scrollHint" style="font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); letter-spacing: 4px; transition: opacity 0.3s;">Görgess lefelé</div>
-      <div id="scrollArrow" style="color: rgba(255,255,255,0.45); font-size: 24px; margin-top: 8px; animation: pulseGlow 2s ease-in-out infinite; transition: opacity 0.3s;">↓</div>
+    <div id="scrollHint">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.65);letter-spacing:4px;">Görgess lefelé</div>
+      <div style="color:rgba(255,255,255,.45);font-size:24px;margin-top:8px;animation:pulseGlow 2s ease-in-out infinite;">↓</div>
     </div>
 
-    <!-- Progress bar -->
-    <div id="videoProgress" style="position: absolute; bottom: 0; left: 0; height: 3px; background: #FF4500; width: 0%; z-index: 4;"></div>
+    <div id="videoProgress"></div>
   </div>
-  <div id="videoSpacer" style="height: 400vh;"></div>
+  <div id="videoSpacer"></div>
 </div>
 
-<!-- Scroll container -->
-<div id="scrollContainer" style="position: relative; z-index: 1; background: #0a0a0a;">
+<!-- ══════════════════════════════════════
+     CONTENT SECTIONS
+══════════════════════════════════════ -->
+<div id="scrollContainer">
 
-  <!-- SECTION: Sztori — kép bal, szöveg jobb -->
-  <div style="min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: stretch;">
-    <div style="position: relative; overflow: hidden; min-height: 60vh;">
-      <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1000&q=85&fit=crop" alt="Klasszikus smash burger" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;" />
-      <div style="position: absolute; inset: 0; background: linear-gradient(to right, transparent 60%, #0a0a0a 100%);"></div>
+  <!-- SZTORI -->
+  <div class="story-grid reveal">
+    <div style="position:relative;overflow:hidden;min-height:60vh;">
+      <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1000&q=85&fit=crop" alt="Klasszikus smash burger"
+           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,#0a0a0a 100%);"></div>
     </div>
-    <div style="display: flex; flex-direction: column; justify-content: center; padding: clamp(40px, 6vw, 100px) clamp(40px, 6vw, 80px);">
-      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #FF4500; letter-spacing: 6px; margin-bottom: 20px;">A SZTORI</div>
-      <h2 style="font-family: 'Anton', sans-serif; font-size: clamp(36px, 5vw, 68px); color: #fff; margin: 0 0 28px 0; line-height: 1; text-transform: uppercase;">
-        Ahol a tűz<br />találkozik<br />a hússal
+    <div style="display:flex;flex-direction:column;justify-content:center;padding:clamp(40px,6vw,100px) clamp(40px,6vw,80px);">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#FF4500;letter-spacing:6px;margin-bottom:20px;">A SZTORI</div>
+      <h2 style="font-family:'Anton',sans-serif;font-size:clamp(36px,5vw,68px);color:#fff;margin:0 0 28px;line-height:1;text-transform:uppercase;">
+        Ahol a tűz<br>találkozik<br>a hússal
       </h2>
-      <p style="font-family: 'Libre Baskerville', serif; font-size: clamp(14px, 1.4vw, 17px); color: rgba(255,255,255,0.7); line-height: 1.9; margin: 0 0 16px 0; max-width: 420px;">
+      <p style="font-family:'Libre Baskerville',serif;font-size:clamp(14px,1.4vw,17px);color:rgba(255,255,255,.7);line-height:1.9;margin:0 0 16px;max-width:420px;">
         2024-ben nyitottuk meg kapuinkat Budapest szívében azzal a céllal, hogy megmutassuk: a burger nem gyorsételkultúra — hanem mesterség.
       </p>
-      <p style="font-family: 'Libre Baskerville', serif; font-size: clamp(14px, 1.4vw, 17px); color: rgba(255,255,255,0.7); line-height: 1.9; margin: 0; max-width: 420px;">
+      <p style="font-family:'Libre Baskerville',serif;font-size:clamp(14px,1.4vw,17px);color:rgba(255,255,255,.7);line-height:1.9;margin:0;max-width:420px;">
         Minden pattyünket friss, 80/20 arányú magyar marhából készítjük, kézi smash technikával. A brisket 12 órán át füstölődik hickory fán — nem egy perccel kevesebbet.
       </p>
-      <div style="display: flex; gap: 48px; margin-top: 48px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex;gap:48px;margin-top:48px;padding-top:40px;border-top:1px solid rgba(255,255,255,.08);">
         <div>
-          <div style="font-family: 'Anton', sans-serif; font-size: 52px; color: #FF4500; line-height: 1;">12</div>
-          <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.45); letter-spacing: 2px; margin-top: 4px;">ÓRA FÜSTÖLÉS</div>
+          <div style="font-family:'Anton',sans-serif;font-size:52px;color:#FF4500;line-height:1;">12</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.45);letter-spacing:2px;margin-top:4px;">ÓRA FÜSTÖLÉS</div>
         </div>
         <div>
-          <div style="font-family: 'Anton', sans-serif; font-size: 52px; color: #FF4500; line-height: 1;">100%</div>
-          <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.45); letter-spacing: 2px; margin-top: 4px;">MAGYAR MARHA</div>
+          <div style="font-family:'Anton',sans-serif;font-size:52px;color:#FF4500;line-height:1;">100%</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.45);letter-spacing:2px;margin-top:4px;">MAGYAR MARHA</div>
         </div>
         <div>
-          <div style="font-family: 'Anton', sans-serif; font-size: 52px; color: #FF4500; line-height: 1;">0</div>
-          <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.45); letter-spacing: 2px; margin-top: 4px;">KOMPROMISSZUM</div>
+          <div style="font-family:'Anton',sans-serif;font-size:52px;color:#FF4500;line-height:1;">0</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.45);letter-spacing:2px;margin-top:4px;">KOMPROMISSZUM</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SECTION: Menü -->
-  <div style="padding: clamp(60px, 8vw, 120px) clamp(24px, 5vw, 80px);">
-    <div style="text-align: center; margin-bottom: 64px;">
-      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #FF4500; letter-spacing: 6px; margin-bottom: 16px;">MENÜ</div>
-      <h2 style="font-family: 'Anton', sans-serif; font-size: clamp(40px, 7vw, 80px); color: #fff; margin: 0; text-transform: uppercase;">A kedvencek</h2>
+  <!-- MENÜ -->
+  <div class="reveal" style="padding:clamp(60px,8vw,120px) clamp(24px,5vw,80px);">
+    <div style="text-align:center;margin-bottom:64px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#FF4500;letter-spacing:6px;margin-bottom:16px;">MENÜ</div>
+      <h2 style="font-family:'Anton',sans-serif;font-size:clamp(40px,7vw,80px);color:#fff;margin:0;text-transform:uppercase;">A kedvencek</h2>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2px; max-width: 1100px; margin: 0 auto;">
+    <div class="menu-grid">
 
-      <!-- Classic Smash -->
-      <div style="position: relative; overflow: hidden; background: #111;">
-        <img src="https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600&q=85&fit=crop" alt="Classic Smash burger" style="width: 100%; height: 260px; object-fit: cover; display: block; opacity: 0.75;" />
-        <div style="position: absolute; top: 16px; left: 16px; font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: #FF4500; letter-spacing: 3px; background: rgba(0,0,0,0.7); padding: 4px 10px;">SIGNATURE</div>
-        <div style="padding: 28px 28px 32px;">
-          <div style="font-family: 'Anton', sans-serif; font-size: 26px; color: #fff; text-transform: uppercase; margin-bottom: 10px;">Classic Smash</div>
-          <p style="font-family: 'Libre Baskerville', serif; font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.7; margin: 0 0 20px 0;">
-            Dupla smash patty (2×120g), amerikai cheddar, karamellizált hagyma, savanyúság, házi special szósz, brioche buci
-          </p>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-family: 'Anton', sans-serif; font-size: 22px; color: #FFC83C;">2 990 Ft</div>
-            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 2px;">480 kcal</div>
+      <div style="position:relative;overflow:hidden;background:#111;">
+        <img src="https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600&q=85&fit=crop" alt="Classic Smash"
+             style="width:100%;height:260px;object-fit:cover;display:block;opacity:.75;">
+        <div style="position:absolute;top:16px;left:16px;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#FF4500;letter-spacing:3px;background:rgba(0,0,0,.7);padding:4px 10px;">SIGNATURE</div>
+        <div style="padding:28px 28px 32px;">
+          <div style="font-family:'Anton',sans-serif;font-size:26px;color:#fff;text-transform:uppercase;margin-bottom:10px;">Classic Smash</div>
+          <p style="font-family:'Libre Baskerville',serif;font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin:0 0 20px;">Dupla smash patty (2×120g), amerikai cheddar, karamellizált hagyma, savanyúság, házi special szósz, brioche buci</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-family:'Anton',sans-serif;font-size:22px;color:#FFC83C;">2 990 Ft</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(255,255,255,.3);letter-spacing:2px;">480 kcal</div>
           </div>
         </div>
       </div>
 
-      <!-- Smoke King -->
-      <div style="position: relative; overflow: hidden; background: #111; border: 1px solid rgba(255,69,0,0.25);">
-        <img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600&q=85&fit=crop" alt="Smoke King burger" style="width: 100%; height: 260px; object-fit: cover; display: block; opacity: 0.75;" />
-        <div style="position: absolute; top: 16px; left: 16px; font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: #FFC83C; letter-spacing: 3px; background: rgba(0,0,0,0.75); padding: 4px 10px;">★ BESTSELLER</div>
-        <div style="padding: 28px 28px 32px;">
-          <div style="font-family: 'Anton', sans-serif; font-size: 26px; color: #fff; text-transform: uppercase; margin-bottom: 10px;">Smoke King</div>
-          <p style="font-family: 'Libre Baskerville', serif; font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.7; margin: 0 0 20px 0;">
-            12 órás füstölt brisket (180g), jalapeño coleslaw, házi BBQ glaze, cheddar, crispy onion, brioche buci
-          </p>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-family: 'Anton', sans-serif; font-size: 22px; color: #FFC83C;">3 490 Ft</div>
-            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 2px;">610 kcal</div>
+      <div style="position:relative;overflow:hidden;background:#111;border:1px solid rgba(255,69,0,.25);">
+        <img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600&q=85&fit=crop" alt="Smoke King"
+             style="width:100%;height:260px;object-fit:cover;display:block;opacity:.75;">
+        <div style="position:absolute;top:16px;left:16px;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#FFC83C;letter-spacing:3px;background:rgba(0,0,0,.75);padding:4px 10px;">★ BESTSELLER</div>
+        <div style="padding:28px 28px 32px;">
+          <div style="font-family:'Anton',sans-serif;font-size:26px;color:#fff;text-transform:uppercase;margin-bottom:10px;">Smoke King</div>
+          <p style="font-family:'Libre Baskerville',serif;font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin:0 0 20px;">12 órás füstölt brisket (180g), jalapeño coleslaw, házi BBQ glaze, cheddar, crispy onion, brioche buci</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-family:'Anton',sans-serif;font-size:22px;color:#FFC83C;">3 490 Ft</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(255,255,255,.3);letter-spacing:2px;">610 kcal</div>
           </div>
         </div>
       </div>
 
-      <!-- Hellfire -->
-      <div style="position: relative; overflow: hidden; background: #111;">
-        <img src="https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=600&q=85&fit=crop" alt="Hellfire spicy burger" style="width: 100%; height: 260px; object-fit: cover; display: block; opacity: 0.75;" />
-        <div style="position: absolute; top: 16px; left: 16px; font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: #FF4500; letter-spacing: 3px; background: rgba(0,0,0,0.7); padding: 4px 10px;">🌶 SPICY</div>
-        <div style="padding: 28px 28px 32px;">
-          <div style="font-family: 'Anton', sans-serif; font-size: 26px; color: #fff; text-transform: uppercase; margin-bottom: 10px;">Hellfire</div>
-          <p style="font-family: 'Libre Baskerville', serif; font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.7; margin: 0 0 20px 0;">
-            Dupla patty, Carolina Reaper szósz, pepper jack sajt, jalapeño, crispy onion, chipotle mayo, brioche buci
-          </p>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-family: 'Anton', sans-serif; font-size: 22px; color: #FFC83C;">3 290 Ft</div>
-            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 2px;">540 kcal</div>
+      <div style="position:relative;overflow:hidden;background:#111;">
+        <img src="https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=600&q=85&fit=crop" alt="Hellfire"
+             style="width:100%;height:260px;object-fit:cover;display:block;opacity:.75;">
+        <div style="position:absolute;top:16px;left:16px;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#FF4500;letter-spacing:3px;background:rgba(0,0,0,.7);padding:4px 10px;">🌶 SPICY</div>
+        <div style="padding:28px 28px 32px;">
+          <div style="font-family:'Anton',sans-serif;font-size:26px;color:#fff;text-transform:uppercase;margin-bottom:10px;">Hellfire</div>
+          <p style="font-family:'Libre Baskerville',serif;font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin:0 0 20px;">Dupla patty, Carolina Reaper szósz, pepper jack sajt, jalapeño, crispy onion, chipotle mayo, brioche buci</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-family:'Anton',sans-serif;font-size:22px;color:#FFC83C;">3 290 Ft</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(255,255,255,.3);letter-spacing:2px;">540 kcal</div>
           </div>
         </div>
       </div>
 
     </div>
-    <div style="text-align: center; margin-top: 48px;">
-      <a href="#" style="font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 4px; color: rgba(255,255,255,0.5); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px;">TELJES MENÜ MEGTEKINTÉSE →</a>
+    <div style="text-align:center;margin-top:48px;">
+      <a href="#" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:4px;color:rgba(255,255,255,.5);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:4px;">TELJES MENÜ MEGTEKINTÉSE →</a>
     </div>
   </div>
 
-  <!-- SECTION: Fotógaléria -->
-  <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 360px; gap: 2px;">
-    <div style="overflow: hidden; position: relative;">
-      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1000&q=85&fit=crop" alt="BBQ grill" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
-      <div style="position: absolute; bottom: 24px; left: 24px; font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); letter-spacing: 3px;">A GRILL</div>
+  <!-- GALÉRIA -->
+  <div class="gallery-grid reveal">
+    <div style="overflow:hidden;position:relative;">
+      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1000&q=85&fit=crop" alt="BBQ grill"
+           style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div style="position:absolute;bottom:24px;left:24px;font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.6);letter-spacing:3px;">A GRILL</div>
     </div>
-    <div style="overflow: hidden; position: relative;">
-      <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=85&fit=crop" alt="Sült krumpli" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
-      <div style="position: absolute; bottom: 24px; left: 24px; font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); letter-spacing: 3px;">KÖRET</div>
+    <div style="overflow:hidden;position:relative;">
+      <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=85&fit=crop" alt="Sült krumpli"
+           style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div style="position:absolute;bottom:24px;left:24px;font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.6);letter-spacing:3px;">KÖRET</div>
     </div>
-    <div style="overflow: hidden; position: relative;">
-      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=85&fit=crop" alt="Étterem hangulat" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
-      <div style="position: absolute; bottom: 24px; left: 24px; font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); letter-spacing: 3px;">HANGULAT</div>
+    <div style="overflow:hidden;position:relative;">
+      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=85&fit=crop" alt="Étterem hangulat"
+           style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div style="position:absolute;bottom:24px;left:24px;font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.6);letter-spacing:3px;">HANGULAT</div>
     </div>
   </div>
 
-  <!-- SECTION: Hogyan készül — 3 lépés -->
-  <div style="padding: clamp(60px, 8vw, 120px) clamp(24px, 5vw, 80px); text-align: center;">
-    <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #FF4500; letter-spacing: 6px; margin-bottom: 16px;">A FOLYAMAT</div>
-    <h2 style="font-family: 'Anton', sans-serif; font-size: clamp(36px, 6vw, 70px); color: #fff; margin: 0 0 64px 0; text-transform: uppercase;">Így kerül a tányérra</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 48px; max-width: 900px; margin: 0 auto;">
+  <!-- FOLYAMAT -->
+  <div class="reveal" style="padding:clamp(60px,8vw,120px) clamp(24px,5vw,80px);text-align:center;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#FF4500;letter-spacing:6px;margin-bottom:16px;">A FOLYAMAT</div>
+    <h2 style="font-family:'Anton',sans-serif;font-size:clamp(36px,6vw,70px);color:#fff;margin:0 0 64px;text-transform:uppercase;">Így kerül a tányérra</h2>
+    <div class="process-grid">
       <div>
-        <div style="font-family: 'Anton', sans-serif; font-size: 72px; color: rgba(255,69,0,0.15); line-height: 1; margin-bottom: 8px;">01</div>
-        <div style="font-family: 'Anton', sans-serif; font-size: 22px; color: #fff; text-transform: uppercase; margin-bottom: 14px;">Friss alapanyag</div>
-        <p style="font-family: 'Libre Baskerville', serif; font-size: 15px; color: rgba(255,255,255,0.55); line-height: 1.8; margin: 0;">
-          Minden reggel friss, helyi farmokról érkező marhahúst bontunk. Csak 80/20 arányú, soha fagyasztott alapanyagot használunk.
-        </p>
+        <div style="font-family:'Anton',sans-serif;font-size:72px;color:rgba(255,69,0,.15);line-height:1;margin-bottom:8px;">01</div>
+        <div style="font-family:'Anton',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;margin-bottom:14px;">Friss alapanyag</div>
+        <p style="font-family:'Libre Baskerville',serif;font-size:15px;color:rgba(255,255,255,.55);line-height:1.8;margin:0;">Minden reggel friss, helyi farmokról érkező marhahúst bontunk. Csak 80/20 arányú, soha fagyasztott alapanyagot használunk.</p>
       </div>
       <div>
-        <div style="font-family: 'Anton', sans-serif; font-size: 72px; color: rgba(255,69,0,0.15); line-height: 1; margin-bottom: 8px;">02</div>
-        <div style="font-family: 'Anton', sans-serif; font-size: 22px; color: #fff; text-transform: uppercase; margin-bottom: 14px;">Smash &amp; Sear</div>
-        <p style="font-family: 'Libre Baskerville', serif; font-size: 15px; color: rgba(255,255,255,0.55); line-height: 1.8; margin: 0;">
-          A húsgolyót 230°C-os öntvényvas lapon lapítjuk, hogy a Maillard-reakció maximális kérget és mélységet adjon minden falatnak.
-        </p>
+        <div style="font-family:'Anton',sans-serif;font-size:72px;color:rgba(255,69,0,.15);line-height:1;margin-bottom:8px;">02</div>
+        <div style="font-family:'Anton',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;margin-bottom:14px;">Smash &amp; Sear</div>
+        <p style="font-family:'Libre Baskerville',serif;font-size:15px;color:rgba(255,255,255,.55);line-height:1.8;margin:0;">A húsgolyót 230°C-os öntvényvas lapon lapítjuk, hogy a Maillard-reakció maximális kérget és mélységet adjon minden falatnak.</p>
       </div>
       <div>
-        <div style="font-family: 'Anton', sans-serif; font-size: 72px; color: rgba(255,69,0,0.15); line-height: 1; margin-bottom: 8px;">03</div>
-        <div style="font-family: 'Anton', sans-serif; font-size: 22px; color: #fff; text-transform: uppercase; margin-bottom: 14px;">Réteg rétegre</div>
-        <p style="font-family: 'Libre Baskerville', serif; font-size: 15px; color: rgba(255,255,255,0.55); line-height: 1.8; margin: 0;">
-          Házi szószok, friss zöldségek, olvasztott sajt — minden burger pontosan az elrendelt sorrendben épül fel, azonnal tálalva.
-        </p>
+        <div style="font-family:'Anton',sans-serif;font-size:72px;color:rgba(255,69,0,.15);line-height:1;margin-bottom:8px;">03</div>
+        <div style="font-family:'Anton',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;margin-bottom:14px;">Réteg rétegre</div>
+        <p style="font-family:'Libre Baskerville',serif;font-size:15px;color:rgba(255,255,255,.55);line-height:1.8;margin:0;">Házi szószok, friss zöldségek, olvasztott sajt — minden burger pontosan az elrendelt sorrendben épül fel, azonnal tálalva.</p>
       </div>
     </div>
   </div>
 
-  <!-- SECTION: Idézet háttérképpel -->
-  <div style="position: relative; min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 80px 40px; overflow: hidden;">
-    <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=1400&q=80&fit=crop" alt="Étterem este" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.3;" />
-    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.55);"></div>
-    <div style="position: relative; z-index: 1; max-width: 720px;">
-      <div style="font-family: 'Anton', sans-serif; font-size: clamp(80px, 15vw, 180px); color: rgba(255,69,0,0.2); line-height: 0.8; margin-bottom: -20px;">"</div>
-      <p style="font-family: 'Libre Baskerville', serif; font-size: clamp(20px, 3vw, 32px); color: rgba(255,255,255,0.95); line-height: 1.6; font-style: italic; margin: 0;">
-        Nem csak hamburgert csinálunk.<br />Élményt adunk minden egyes falattal.
+  <!-- IDÉZET -->
+  <div class="reveal" style="position:relative;min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 40px;overflow:hidden;">
+    <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=1400&q=80&fit=crop" alt="Étterem este"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.3;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,.55);"></div>
+    <div style="position:relative;z-index:1;max-width:720px;">
+      <div style="font-family:'Anton',sans-serif;font-size:clamp(80px,15vw,180px);color:rgba(255,69,0,.2);line-height:.8;margin-bottom:-20px;">"</div>
+      <p style="font-family:'Libre Baskerville',serif;font-size:clamp(20px,3vw,32px);color:rgba(255,255,255,.95);line-height:1.6;font-style:italic;margin:0;">
+        Nem csak hamburgert csinálunk.<br>Élményt adunk minden egyes falattal.
       </p>
-      <div style="width: 50px; height: 2px; background: #FF4500; margin: 32px auto;"></div>
-      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: rgba(255,200,60,0.7); letter-spacing: 4px;">KOVÁCS PÉTER — ALAPÍTÓ</div>
+      <div style="width:50px;height:2px;background:#FF4500;margin:32px auto;"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:rgba(255,200,60,.7);letter-spacing:4px;">KOVÁCS PÉTER — ALAPÍTÓ</div>
     </div>
   </div>
 
-  <!-- SECTION: CTA / Footer -->
-  <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 70vh; align-items: stretch;">
-
-    <!-- Bal: kép -->
-    <div style="position: relative; overflow: hidden; min-height: 400px;">
-      <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=900&q=85&fit=crop" alt="Burger tálalás" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;" />
-      <div style="position: absolute; inset: 0; background: linear-gradient(to left, #0a0a0a 0%, transparent 60%);"></div>
+  <!-- CTA -->
+  <div class="cta-grid reveal">
+    <div style="position:relative;overflow:hidden;min-height:400px;">
+      <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=900&q=85&fit=crop" alt="Burger tálalás"
+           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to left,#0a0a0a 0%,transparent 60%);"></div>
     </div>
-
-    <!-- Jobb: info + CTA -->
-    <div style="display: flex; flex-direction: column; justify-content: center; padding: clamp(40px, 6vw, 100px) clamp(40px, 6vw, 80px);">
-      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #FF4500; letter-spacing: 6px; margin-bottom: 20px;">LÁTOGASS EL</div>
-      <h2 style="font-family: 'Anton', sans-serif; font-size: clamp(40px, 6vw, 80px); color: #fff; margin: 0 0 32px 0; text-transform: uppercase; line-height: 0.95;">
-        Gyere,<br />kóstold meg!
+    <div style="display:flex;flex-direction:column;justify-content:center;padding:clamp(40px,6vw,100px) clamp(40px,6vw,80px);">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#FF4500;letter-spacing:6px;margin-bottom:20px;">LÁTOGASS EL</div>
+      <h2 style="font-family:'Anton',sans-serif;font-size:clamp(40px,6vw,80px);color:#fff;margin:0 0 32px;text-transform:uppercase;line-height:.95;">
+        Gyere,<br>kóstold meg!
       </h2>
-      <div style="font-family: 'Libre Baskerville', serif; font-size: 16px; color: rgba(255,255,255,0.6); line-height: 2; margin-bottom: 40px;">
+      <div style="font-family:'Libre Baskerville',serif;font-size:16px;color:rgba(255,255,255,.6);line-height:2;margin-bottom:40px;">
         <div>📍 Budapest, VII. kerület, Dohány u. 42.</div>
         <div>🕐 Kedd–Vasárnap: 11:00–22:00</div>
         <div>📞 +36 1 234 5678</div>
       </div>
-      <div style="display: flex; flex-direction: column; gap: 14px; max-width: 300px;">
-        <a href="#" style="font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px; color: #fff; background: #FF4500; padding: 16px 36px; text-decoration: none; text-align: center;">ASZTALFOGLALÁS</a>
-        <a href="#" style="font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 14px 36px; text-decoration: none; text-align: center;">TELJES MENÜ</a>
+      <div style="display:flex;flex-direction:column;gap:14px;max-width:300px;">
+        <a href="#" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:#fff;background:#FF4500;padding:16px 36px;text-decoration:none;text-align:center;">ASZTALFOGLALÁS</a>
+        <a href="#" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.2);padding:14px 36px;text-decoration:none;text-align:center;">TELJES MENÜ</a>
       </div>
-      <div style="margin-top: 56px; display: flex; gap: 28px;">
-        <a href="#" style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; letter-spacing: 3px;">Instagram</a>
-        <a href="#" style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; letter-spacing: 3px;">Facebook</a>
-        <a href="#" style="font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; letter-spacing: 3px;">TikTok</a>
+      <div style="margin-top:56px;display:flex;gap:28px;">
+        <a href="#" style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.35);text-decoration:none;letter-spacing:3px;">Instagram</a>
+        <a href="#" style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.35);text-decoration:none;letter-spacing:3px;">Facebook</a>
+        <a href="#" style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.35);text-decoration:none;letter-spacing:3px;">TikTok</a>
       </div>
     </div>
   </div>
 
-  <!-- Footer sor -->
-  <div style="border-top: 1px solid rgba(255,255,255,0.06); padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-    <div style="font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: rgba(255,255,255,0.2); letter-spacing: 3px;">SMOKE &amp; GRILL</div>
-    <div style="font-family: 'Libre Baskerville', serif; font-size: 12px; color: rgba(255,255,255,0.18);">© 2024 Smoke &amp; Grill. Minden jog fenntartva.</div>
+  <!-- FOOTER -->
+  <div style="border-top:1px solid rgba(255,255,255,.06);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:rgba(255,255,255,.2);letter-spacing:3px;">SMOKE &amp; GRILL</div>
+    <div style="font-family:'Libre Baskerville',serif;font-size:12px;color:rgba(255,255,255,.18);">© 2024 Smoke &amp; Grill. Minden jog fenntartva.</div>
   </div>
 
 </div>
 
-</x-dc>
-<script type="text/x-dc" data-dc-script>
+<script>
+(function () {
+  'use strict';
 
-class Component extends DCLogic {
-  componentDidMount() {
-    const sections = document.querySelectorAll('#scrollContainer > div');
-    sections.forEach(s => {
-      s.style.opacity = '0';
-      s.style.transform = 'translateY(40px)';
-      s.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+  // Lower = smoother/more lag. Higher = snappier/more jumpy.
+  var LERP_FACTOR = 0.1;
+
+  var video       = document.getElementById('scrollVideo');
+  var section     = document.getElementById('videoSection');
+  var bar         = document.getElementById('videoProgress');
+  var hint        = document.getElementById('scrollHint');
+  var heroOverlay = document.getElementById('heroOverlay');
+
+  var targetTime    = 0;
+  var displayedTime = 0;
+
+  function getScrollTop() {
+    return window.scrollY
+      || window.pageYOffset
+      || document.documentElement.scrollTop
+      || document.body.scrollTop
+      || 0;
+  }
+
+  function readScroll() {
+    var scrollTop  = getScrollTop();
+    var sectionTop = section.offsetTop;
+    var spacerH    = section.offsetHeight - window.innerHeight;
+    if (spacerH <= 0) return;
+
+    var frac = Math.min(Math.max((scrollTop - sectionTop) / spacerH, 0), 1);
+    targetTime = frac * (video.duration || 0);
+
+    if (bar)  bar.style.width = (frac * 100) + '%';
+    if (hint) hint.style.opacity = frac > 0.03 ? '0' : '1';
+
+    // Hero fades IN at the end — frac 0.85 → 1.0
+    if (heroOverlay) {
+      var op = frac >= 0.85 ? Math.min(1, (frac - 0.85) / 0.15) : 0;
+      if (op > 0.5) heroOverlay.classList.add('visible');
+      else          heroOverlay.classList.remove('visible');
+    }
+  }
+
+  function rafLoop() {
+    displayedTime += (targetTime - displayedTime) * LERP_FACTOR;
+    if (Math.abs(video.currentTime - displayedTime) > 0.008) {
+      video.currentTime = displayedTime;
+    }
+    requestAnimationFrame(rafLoop);
+  }
+
+  function initVideo() {
+    video.pause();
+    readScroll();
+    window.addEventListener('scroll', readScroll, { passive: true });
+    document.body.addEventListener('scroll', readScroll, { passive: true });
+    requestAnimationFrame(rafLoop);
+  }
+
+  if (video) {
+    if (video.readyState >= 1) {
+      initVideo();
+    } else {
+      video.addEventListener('loadedmetadata', initVideo, { once: true });
+      video.load();
+    }
+  }
+
+  // Section reveal on scroll
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+        observer.unobserve(e.target);
+      }
     });
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.style.opacity = '1';
-          e.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, { threshold: 0.15 });
-    sections.forEach(s => observer.observe(s));
-  }
+  }, { threshold: 0.12 });
 
-  renderVals() {
-    return {};
-  }
-}
+  document.querySelectorAll('.reveal').forEach(function (el) {
+    observer.observe(el);
+  });
 
+})();
 </script>
+
 </body>
 </html>
