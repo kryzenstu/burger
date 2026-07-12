@@ -11,6 +11,7 @@ type Burger = {
   tag: string;
   accent: string;
   price: number;
+  priceEur: number;
   img: string;
   stats: { label: string; value: number }[];
 };
@@ -23,6 +24,7 @@ const BURGERS: Burger[] = [
     tag: 'Marhahús, cheddar, savanyú uborka, hagyma, házi szósz.',
     accent: '#e8b84b',
     price: 2600,
+    priceEur: 6.50,
     img: '/burgers/classic.webp',
     stats: [
       { label: 'Húsosság', value: 70 },
@@ -38,6 +40,7 @@ const BURGERS: Burger[] = [
     tag: 'Két smash-pogácsa, dupla cheddar, karamellizált hagyma.',
     accent: '#ff7a1f',
     price: 3200,
+    priceEur: 8.00,
     img: '/burgers/smash.webp',
     stats: [
       { label: 'Húsosság', value: 100 },
@@ -53,6 +56,7 @@ const BURGERS: Burger[] = [
     tag: 'Jalapeño, chipotle majonéz, pepper jack sajt, ropogós hagyma.',
     accent: '#ff3b2f',
     price: 3400,
+    priceEur: 8.50,
     img: '/burgers/inferno.webp',
     stats: [
       { label: 'Húsosság', value: 75 },
@@ -68,8 +72,9 @@ const SLIDE_VW = 74;
 const PEEK_VW  = (100 - SLIDE_VW) / 2; // 13
 
 export default function BurgerRoster() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const r = t.roster;
+  const isEur = lang !== 'hu';
   const [active, setActive] = useState(0);
   const b = BURGERS[active];
 
@@ -123,15 +128,17 @@ export default function BurgerRoster() {
       });
       const counter = { v: 0 };
       gsap.to(counter, {
-        v: b.price, duration: 0.45, delay: 0.25,
+        v: isEur ? b.priceEur : b.price, duration: 0.45, delay: 0.25,
         onUpdate: () => {
           if (priceRef.current)
-            priceRef.current.textContent = Math.round(counter.v).toLocaleString('hu-HU');
+            priceRef.current.textContent = isEur
+              ? counter.v.toFixed(2)
+              : Math.round(counter.v).toLocaleString('hu-HU');
         },
       });
     }, container);
     return () => ctx.revert();
-  }, [active, b]);
+  }, [active, b, isEur]);
 
   return (
     <section className="relative py-24" style={{ background: '#E5DDD0' }}>
@@ -264,8 +271,12 @@ export default function BurgerRoster() {
               <div className="mt-7 flex items-center gap-5">
                 <div className="text-3xl font-bold" style={{ color: '#1C1410' }}>
                   {isActive
-                    ? <><span ref={priceRef}>{bg.price.toLocaleString('hu-HU')}</span> Ft</>
-                    : <>{bg.price.toLocaleString('hu-HU')} Ft</>
+                    ? isEur
+                      ? <>€<span ref={priceRef}>{bg.priceEur.toFixed(2)}</span></>
+                      : <><span ref={priceRef}>{bg.price.toLocaleString('hu-HU')}</span> Ft</>
+                    : isEur
+                      ? <>€{bg.priceEur.toFixed(2)}</>
+                      : <>{bg.price.toLocaleString('hu-HU')} Ft</>
                   }
                 </div>
                 <button

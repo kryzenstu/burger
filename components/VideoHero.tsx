@@ -1,8 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useLang } from '@/components/LangContext';
 
 export default function VideoHero() {
+  const { t } = useLang();
+  const h = t.hero;
+
   useEffect(() => {
     const video = document.getElementById('scrollVideo') as HTMLVideoElement | null;
     const section = document.getElementById('videoSection');
@@ -110,14 +114,14 @@ export default function VideoHero() {
             </h1>
             <div style={{ width: 80, height: 3, background: '#FF4500', margin: '28px auto' }} />
             <p style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(15px,2vw,22px)', color: 'rgba(255,255,255,.9)', maxWidth: 500, margin: '0 auto 36px', lineHeight: 1.6, fontStyle: 'italic', textShadow: '0 2px 12px rgba(0,0,0,.6)' }}>
-              Kézműves hamburgerek, füstölt ízek, amerikai lélek.
+              {h.tagline}
             </p>
             <a href="#scrollContainer" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, letterSpacing: 4, color: '#fff', background: '#FF4500', padding: '16px 44px', textDecoration: 'none' }}>
-              FEDEZD FEL ↓
+              {h.discover}
             </a>
           </div>
           <div id="scrollHint">
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, color: 'rgba(255,255,255,.65)', letterSpacing: 4 }}>Görgess lefelé</div>
+            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, color: 'rgba(255,255,255,.65)', letterSpacing: 4 }}>{h.scroll}</div>
             <div style={{ color: 'rgba(255,255,255,.45)', fontSize: 24, marginTop: 8, animation: 'pulseGlow 2s ease-in-out infinite' }}>↓</div>
           </div>
           <div id="videoProgress" />

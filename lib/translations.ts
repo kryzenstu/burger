@@ -3,6 +3,11 @@ export type Lang = 'hu' | 'en' | 'de' | 'nl';
 export const translations = {
   hu: {
     loading: 'BETÖLTÉS...',
+    hero: {
+      tagline: 'Kézműves hamburgerek, füstölt ízek, amerikai lélek.',
+      discover: 'FEDEZD FEL ↓',
+      scroll: 'Görgess lefelé',
+    },
     story: {
       label: 'A SZTORI',
       title: ['Ahol a tűz', 'találkozik', 'a hússal'],
@@ -45,6 +50,11 @@ export const translations = {
 
   en: {
     loading: 'LOADING...',
+    hero: {
+      tagline: 'Craft burgers, smoky flavours, American soul.',
+      discover: 'DISCOVER ↓',
+      scroll: 'Scroll down',
+    },
     story: {
       label: 'THE STORY',
       title: ['Where fire', 'meets', 'the meat'],
@@ -87,6 +97,11 @@ export const translations = {
 
   de: {
     loading: 'LADEN...',
+    hero: {
+      tagline: 'Handgemachte Burger, rauchige Aromen, amerikanische Seele.',
+      discover: 'ENTDECKEN ↓',
+      scroll: 'Nach unten scrollen',
+    },
     story: {
       label: 'DIE GESCHICHTE',
       title: ['Wo das Feuer', 'auf das', 'Fleisch trifft'],
@@ -129,6 +144,11 @@ export const translations = {
 
   nl: {
     loading: 'LADEN...',
+    hero: {
+      tagline: 'Ambachtelijke burgers, rokerige smaken, Amerikaanse ziel.',
+      discover: 'ONTDEKKEN ↓',
+      scroll: 'Scroll naar beneden',
+    },
     story: {
       label: 'HET VERHAAL',
       title: ['Waar vuur', 'het vlees', 'ontmoet'],
