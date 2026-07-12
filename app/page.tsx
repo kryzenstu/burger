@@ -1,6 +1,52 @@
 import VideoHero from '@/components/VideoHero';
 import BurgerRoster from '@/components/BurgerRoster';
 
+const FONT = {
+  title: { fontFamily: "'Anton',sans-serif" },
+  label: { fontFamily: "'Bebas Neue',sans-serif" },
+  body:  { fontFamily: "'Libre Baskerville',serif" },
+};
+
+const C = {
+  bg1:    '#EDE7DB',   // egységes cream
+  bg2:    '#EDE7DB',   // egységes cream
+  bg3:    '#1C1410',   // sötét footer/CTA
+  text:   '#1C1410',   // majdnem fekete
+  muted:  '#7A6A58',   // közepes barna
+  accent: '#C8410A',   // terrakotta narancs
+  accentLight: '#F0621A',
+};
+
+function Section({ children, bg = C.bg1, maxW = '42rem' }: {
+  children: React.ReactNode;
+  bg?: string;
+  maxW?: string;
+}) {
+  return (
+    <section className="reveal w-full" style={{ background: bg, padding: '80px 0' }}>
+      <div style={{ maxWidth: maxW, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ ...FONT.label, fontSize: 12, color: C.accent, letterSpacing: 6, margin: '0 0 12px' }}>
+      {children}
+    </p>
+  );
+}
+
+function Title({ children, dark = true }: { children: React.ReactNode; dark?: boolean }) {
+  return (
+    <h2 style={{ ...FONT.title, fontSize: 'clamp(36px,6vw,60px)', color: dark ? C.text : '#fff', margin: '0 0 24px', lineHeight: 1, textTransform: 'uppercase' }}>
+      {children}
+    </h2>
+  );
+}
+
 export default function Home() {
   return (
     <>
@@ -8,140 +54,98 @@ export default function Home() {
 
       <div id="scrollContainer">
 
-        {/* SZTORI */}
-        <div className="story-grid reveal">
-          <div style={{ position: 'relative', overflow: 'hidden', minHeight: '60vh' }}>
-            <img
-              src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1000&q=85&fit=crop"
-              alt="Klasszikus smash burger"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right,transparent 60%,#0a0a0a 100%)' }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(40px,6vw,100px) clamp(40px,6vw,80px)' }}>
-            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: '#FF4500', letterSpacing: 6, marginBottom: 20 }}>A SZTORI</div>
-            <h2 style={{ fontFamily: "'Anton',sans-serif", fontSize: 'clamp(36px,5vw,68px)', color: '#fff', margin: '0 0 28px', lineHeight: 1, textTransform: 'uppercase' }}>
-              Ahol a tűz<br />találkozik<br />a hússal
-            </h2>
-            <p style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 'clamp(14px,1.4vw,17px)', color: 'rgba(255,255,255,.7)', lineHeight: 1.9, margin: '0 0 16px', maxWidth: 420 }}>
-              2024-ben nyitottuk meg kapuinkat Budapest szívében azzal a céllal, hogy megmutassuk: a burger nem gyorsételkultúra — hanem mesterség.
-            </p>
-            <p style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 'clamp(14px,1.4vw,17px)', color: 'rgba(255,255,255,.7)', lineHeight: 1.9, margin: 0, maxWidth: 420 }}>
-              Minden pattyünket friss, 80/20 arányú magyar marhából készítjük, kézi smash technikával. A brisket 12 órán át füstölődik hickory fán — nem egy perccel kevesebbet.
-            </p>
-            <div className="story-stats" style={{ display: 'flex', gap: 48, marginTop: 48, paddingTop: 40, borderTop: '1px solid rgba(255,255,255,.08)' }}>
-              <div>
-                <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 52, color: '#FF4500', lineHeight: 1 }}>12</div>
-                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.45)', letterSpacing: 2, marginTop: 4 }}>ÓRA FÜSTÖLÉS</div>
-              </div>
-              <div>
-                <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 52, color: '#FF4500', lineHeight: 1 }}>100%</div>
-                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.45)', letterSpacing: 2, marginTop: 4 }}>MAGYAR MARHA</div>
-              </div>
-              <div>
-                <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 52, color: '#FF4500', lineHeight: 1 }}>0</div>
-                <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.45)', letterSpacing: 2, marginTop: 4 }}>KOMPROMISSZUM</div>
-              </div>
+        {/* ── SZTORI ── */}
+        <section className="reveal" style={{ background: C.bg1 }}>
+          {/* Szöveg blokk — bal igazított */}
+          <div style={{ maxWidth: '64rem', margin: '0 auto', padding: '80px 32px 56px' }}>
+            <p style={{ ...FONT.label, fontSize: 12, color: C.accent, letterSpacing: 6, margin: '0 0 16px' }}>A SZTORI</p>
+            <div className="sztori-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
+              <h2 style={{ ...FONT.title, fontSize: 'clamp(42px,5.5vw,72px)', color: C.text, margin: 0, lineHeight: 1.15, textTransform: 'uppercase' }}>
+                Ahol a tűz<br />találkozik<br />a hússal
+              </h2>
+              <p style={{ ...FONT.body, fontSize: 16, color: C.muted, lineHeight: 1.9, margin: 0 }}>
+                2024-ben nyitottuk meg kapuinkat Budapest szívében. A burger nálunk nem gyorsételkultúra — hanem mesterség. Friss, 80/20 arányú magyar marha, kézi smash technika, 12 óra hickory füst.
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* BURGER ROSTER */}
+          {/* Stat sáv — sötét, teljes szélesség */}
+          <div style={{ background: C.bg3, display: 'flex' }}>
+            {([['12', 'óra füstölés'], ['100%', 'magyar marha'], ['0', 'kompromisszum']] as const).map(([num, label], i) => (
+              <div key={label} style={{
+                flex: 1, padding: '36px 0', textAlign: 'center',
+                borderLeft: i > 0 ? '1px solid rgba(255,255,255,.08)' : 'none',
+              }}>
+                <div style={{ ...FONT.title, fontSize: 'clamp(36px,4vw,52px)', color: C.accent, lineHeight: 1 }}>{num}</div>
+                <div style={{ ...FONT.label, fontSize: 11, color: 'rgba(255,255,255,.4)', letterSpacing: 3, marginTop: 8 }}>{label.toUpperCase()}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── BURGER ROSTER ── */}
         <div className="reveal">
           <BurgerRoster />
         </div>
 
-        {/* GALÉRIA */}
-        <div className="gallery-grid reveal">
-          <div style={{ overflow: 'hidden', position: 'relative' }}>
-            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1000&q=85&fit=crop" alt="BBQ grill"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.6)', letterSpacing: 3 }}>A GRILL</div>
+        {/* ── FOLYAMAT ── */}
+        <Section bg={C.bg2} maxW="56rem">
+          <Label>A FOLYAMAT</Label>
+          <Title>Így kerül a tányérra</Title>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 40, marginTop: 48, textAlign: 'left' }}>
+            {([
+              ['01', 'Friss alapanyag', 'Minden reggel helyi farmokról érkező friss marha. 80/20 arány, soha fagyasztott.'],
+              ['02', 'Smash & Sear',    '230°C-os öntöttvas lap, Maillard-reakció, tökéletes kéreg minden falatban.'],
+              ['03', 'Réteg rétegre',   'Házi szószok, friss zöldség, olvasztott sajt — az elrendelt sorrendben, azonnal tálalva.'],
+            ] as const).map(([num, title, text]) => (
+              <div key={num} style={{ borderTop: `2px solid ${C.accent}`, paddingTop: 20 }}>
+                <div style={{ ...FONT.title, fontSize: 44, color: `${C.accent}22`, lineHeight: 1, marginBottom: 4 }}>{num}</div>
+                <div style={{ ...FONT.label, fontSize: 18, color: C.text, textTransform: 'uppercase', marginBottom: 10 }}>{title}</div>
+                <p style={{ ...FONT.body, fontSize: 14, color: C.muted, lineHeight: 1.85, margin: 0 }}>{text}</p>
+              </div>
+            ))}
           </div>
-          <div style={{ overflow: 'hidden', position: 'relative' }}>
-            <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&q=85&fit=crop" alt="Sült krumpli"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.6)', letterSpacing: 3 }}>KÖRET</div>
-          </div>
-          <div style={{ overflow: 'hidden', position: 'relative' }}>
-            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=85&fit=crop" alt="Étterem hangulat"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.6)', letterSpacing: 3 }}>HANGULAT</div>
-          </div>
-        </div>
+        </Section>
 
-        {/* FOLYAMAT */}
-        <div className="reveal" style={{ padding: 'clamp(60px,8vw,120px) clamp(24px,5vw,80px)', textAlign: 'center' }}>
-          <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: '#FF4500', letterSpacing: 6, marginBottom: 16 }}>A FOLYAMAT</div>
-          <h2 style={{ fontFamily: "'Anton',sans-serif", fontSize: 'clamp(36px,6vw,70px)', color: '#fff', margin: '0 0 64px', textTransform: 'uppercase' }}>Így kerül a tányérra</h2>
-          <div className="process-grid">
-            <div>
-              <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 72, color: 'rgba(255,69,0,.15)', lineHeight: 1, marginBottom: 8 }}>01</div>
-              <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 22, color: '#fff', textTransform: 'uppercase', marginBottom: 14 }}>Friss alapanyag</div>
-              <p style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 15, color: 'rgba(255,255,255,.55)', lineHeight: 1.8, margin: 0 }}>Minden reggel friss, helyi farmokról érkező marhahúst bontunk. Csak 80/20 arányú, soha fagyasztott alapanyagot használunk.</p>
-            </div>
-            <div>
-              <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 72, color: 'rgba(255,69,0,.15)', lineHeight: 1, marginBottom: 8 }}>02</div>
-              <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 22, color: '#fff', textTransform: 'uppercase', marginBottom: 14 }}>Smash &amp; Sear</div>
-              <p style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 15, color: 'rgba(255,255,255,.55)', lineHeight: 1.8, margin: 0 }}>A húsgolyót 230°C-os öntvényvas lapon lapítjuk, hogy a Maillard-reakció maximális kérget és mélységet adjon minden falatnak.</p>
-            </div>
-            <div>
-              <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 72, color: 'rgba(255,69,0,.15)', lineHeight: 1, marginBottom: 8 }}>03</div>
-              <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 22, color: '#fff', textTransform: 'uppercase', marginBottom: 14 }}>Réteg rétegre</div>
-              <p style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 15, color: 'rgba(255,255,255,.55)', lineHeight: 1.8, margin: 0 }}>Házi szószok, friss zöldségek, olvasztott sajt — minden burger pontosan az elrendelt sorrendben épül fel, azonnal tálalva.</p>
-            </div>
-          </div>
-        </div>
+        {/* ── IDÉZET ── */}
+        <Section bg={C.bg3}>
+          <div style={{ ...FONT.title, fontSize: 'clamp(64px,10vw,96px)', color: `${C.accentLight}30`, lineHeight: 0.75, marginBottom: -4 }}>&ldquo;</div>
+          <p style={{ ...FONT.body, fontSize: 'clamp(19px,2.5vw,26px)', color: 'rgba(255,255,255,.9)', lineHeight: 1.7, fontStyle: 'italic', margin: 0 }}>
+            Nem csak hamburgert csinálunk.<br />Élményt adunk minden egyes falattal.
+          </p>
+          <div style={{ width: 40, height: 2, background: C.accentLight, margin: '28px auto 16px' }} />
+          <div style={{ ...FONT.label, fontSize: 13, color: 'rgba(255,200,120,.65)', letterSpacing: 4 }}>KOVÁCS PÉTER — ALAPÍTÓ</div>
+        </Section>
 
-        {/* IDÉZET */}
-        <div className="reveal" style={{ position: 'relative', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 40px', overflow: 'hidden' }}>
-          <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=1400&q=80&fit=crop" alt="Étterem este"
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.3 }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.55)' }} />
-          <div style={{ position: 'relative', zIndex: 1, maxWidth: 720 }}>
-            <div style={{ fontFamily: "'Anton',sans-serif", fontSize: 'clamp(80px,15vw,180px)', color: 'rgba(255,69,0,.2)', lineHeight: 0.8, marginBottom: -20 }}>&ldquo;</div>
-            <p style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 'clamp(20px,3vw,32px)', color: 'rgba(255,255,255,.95)', lineHeight: 1.6, fontStyle: 'italic', margin: 0 }}>
-              Nem csak hamburgert csinálunk.<br />Élményt adunk minden egyes falattal.
-            </p>
-            <div style={{ width: 50, height: 2, background: '#FF4500', margin: '32px auto' }} />
-            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 15, color: 'rgba(255,200,60,.7)', letterSpacing: 4 }}>KOVÁCS PÉTER — ALAPÍTÓ</div>
+        {/* ── CTA ── */}
+        <Section bg={C.bg1} maxW="32rem">
+          <Label>LÁTOGASS EL</Label>
+          <Title>Gyere,<br />kóstold meg!</Title>
+          <div style={{ ...FONT.body, fontSize: 16, color: C.muted, lineHeight: 2.4, marginBottom: 40 }}>
+            <div>Budapest, VII. ker., Dohány u. 42.</div>
+            <div>Kedd–Vasárnap · 11:00–22:00</div>
+            <div>+36 1 234 5678</div>
           </div>
-        </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center' }}>
+            <a href="#" style={{ ...FONT.label, fontSize: 16, letterSpacing: 5, color: '#fff', background: C.accent, padding: '16px 52px', textDecoration: 'none', display: 'inline-block' }}>
+              ASZTALFOGLALÁS
+            </a>
+            <a href="#" style={{ ...FONT.label, fontSize: 13, letterSpacing: 3, color: C.muted, textDecoration: 'none', borderBottom: `1px solid ${C.muted}50`, paddingBottom: 2 }}>
+              TELJES MENÜ
+            </a>
+          </div>
+          <div style={{ marginTop: 48, display: 'flex', justifyContent: 'center', gap: 36 }}>
+            {['Instagram', 'Facebook', 'TikTok'].map(s => (
+              <a key={s} href="#" style={{ ...FONT.label, fontSize: 12, color: C.muted, textDecoration: 'none', letterSpacing: 3 }}>{s}</a>
+            ))}
+          </div>
+        </Section>
 
-        {/* CTA */}
-        <div className="cta-grid reveal">
-          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 400 }}>
-            <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=900&q=85&fit=crop" alt="Burger tálalás"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left,#0a0a0a 0%,transparent 60%)' }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(40px,6vw,100px) clamp(40px,6vw,80px)' }}>
-            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: '#FF4500', letterSpacing: 6, marginBottom: 20 }}>LÁTOGASS EL</div>
-            <h2 style={{ fontFamily: "'Anton',sans-serif", fontSize: 'clamp(40px,6vw,80px)', color: '#fff', margin: '0 0 32px', textTransform: 'uppercase', lineHeight: 0.95 }}>
-              Gyere,<br />kóstold meg!
-            </h2>
-            <div style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 16, color: 'rgba(255,255,255,.6)', lineHeight: 2, marginBottom: 40 }}>
-              <div>📍 Budapest, VII. kerület, Dohány u. 42.</div>
-              <div>🕐 Kedd–Vasárnap: 11:00–22:00</div>
-              <div>📞 +36 1 234 5678</div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 300 }}>
-              <a href="#" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, letterSpacing: 4, color: '#fff', background: '#FF4500', padding: '16px 36px', textDecoration: 'none', textAlign: 'center' }}>ASZTALFOGLALÁS</a>
-              <a href="#" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, letterSpacing: 3, color: 'rgba(255,255,255,.6)', border: '1px solid rgba(255,255,255,.2)', padding: '14px 36px', textDecoration: 'none', textAlign: 'center' }}>TELJES MENÜ</a>
-            </div>
-            <div style={{ marginTop: 56, display: 'flex', gap: 28 }}>
-              <a href="#" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.35)', textDecoration: 'none', letterSpacing: 3 }}>Instagram</a>
-              <a href="#" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.35)', textDecoration: 'none', letterSpacing: 3 }}>Facebook</a>
-              <a href="#" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 13, color: 'rgba(255,255,255,.35)', textDecoration: 'none', letterSpacing: 3 }}>TikTok</a>
-            </div>
-          </div>
-        </div>
-
-        {/* FOOTER */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,.06)', padding: '28px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: 'rgba(255,255,255,.2)', letterSpacing: 3 }}>SMOKE &amp; GRILL</div>
-          <div style={{ fontFamily: "'Libre Baskerville',serif", fontSize: 12, color: 'rgba(255,255,255,.18)' }}>© 2024 Smoke &amp; Grill. Minden jog fenntartva.</div>
-        </div>
+        {/* ── FOOTER ── */}
+        <footer style={{ borderTop: `1px solid rgba(0,0,0,.08)`, background: C.bg2, padding: '24px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <div style={{ ...FONT.label, fontSize: 15, color: C.muted, letterSpacing: 4 }}>SMOKE &amp; GRILL</div>
+          <div style={{ ...FONT.body, fontSize: 11, color: `${C.muted}99` }}>© 2024 Smoke &amp; Grill</div>
+        </footer>
 
       </div>
     </>

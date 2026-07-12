@@ -131,7 +131,7 @@ export default function BurgerRoster() {
   }, [active, b]);
 
   return (
-    <section className="relative bg-[#0d0b0a] py-24">
+    <section className="relative py-24" style={{ background: '#EDE7DB' }}>
       {/* Header */}
       <div className="px-6 text-center">
         <p
@@ -140,7 +140,7 @@ export default function BurgerRoster() {
         >
           VÁLASZD KI A TIÉD
         </p>
-        <h2 className="mb-12 text-4xl font-bold tracking-tight text-white md:text-5xl">
+        <h2 className="mb-12 text-4xl font-bold tracking-tight md:text-5xl" style={{ color: '#1C1410' }}>
           A mi burgereink
         </h2>
       </div>
@@ -185,17 +185,27 @@ export default function BurgerRoster() {
               <p className="text-sm italic tracking-wide" style={{ color: bg.accent }}>
                 {bg.sub}
               </p>
-              <h3 className="mt-1 text-3xl font-bold text-white md:text-4xl">{bg.name}</h3>
-              <p className="mt-2 max-w-sm text-sm text-white/50">{bg.tag}</p>
+              <h3 className="mt-1 text-3xl font-bold md:text-4xl" style={{ color: '#1C1410' }}>{bg.name}</h3>
+              <p className="mt-2 max-w-sm text-sm" style={{ color: '#7A6A58' }}>{bg.tag}</p>
 
               {/* Large burger image */}
               <div className="relative mt-5 flex items-center justify-center">
+                {/* fekete alap glow */}
                 <div
                   className="pointer-events-none absolute rounded-full"
                   style={{
-                    width: 300, height: 300,
-                    background: `radial-gradient(circle, ${bg.accent}50 0%, transparent 68%)`,
-                    filter: 'blur(36px)',
+                    width: 270, height: 270,
+                    background: 'radial-gradient(circle, rgba(180,130,0,0.92) 0%, rgba(120,85,0,0.5) 45%, transparent 70%)',
+                    filter: 'blur(12px)',
+                  }}
+                />
+                {/* accent szín glow felette */}
+                <div
+                  className="pointer-events-none absolute rounded-full"
+                  style={{
+                    width: 190, height: 190,
+                    background: `radial-gradient(circle, ${bg.accent}45 0%, transparent 70%)`,
+                    filter: 'blur(10px)',
                   }}
                 />
                 <img
@@ -216,7 +226,7 @@ export default function BurgerRoster() {
                   return (
                     <div key={s.label} data-row={i} className="text-left">
                       <div className="mb-1.5 flex items-baseline justify-between">
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: '#7A6A58' }}>
                           {s.label}
                         </span>
                         <span className="text-[10px] font-bold tabular-nums" style={{ color: bg.accent }}>
@@ -234,7 +244,7 @@ export default function BurgerRoster() {
                                 flex: 1,
                                 height: j % 2 === 0 ? 10 : 7,
                                 borderRadius: 2,
-                                backgroundColor: on ? bg.accent : 'rgba(255,255,255,0.06)',
+                                backgroundColor: on ? bg.accent : 'rgba(0,0,0,0.08)',
                                 boxShadow: on ? `0 0 6px ${bg.accent}60` : 'none',
                                 opacity: 0,
                               }}
@@ -249,7 +259,7 @@ export default function BurgerRoster() {
 
               {/* Price + CTA */}
               <div className="mt-7 flex items-center gap-5">
-                <div className="text-3xl font-bold text-white">
+                <div className="text-3xl font-bold" style={{ color: '#1C1410' }}>
                   {isActive
                     ? <><span ref={priceRef}>{bg.price.toLocaleString('hu-HU')}</span> Ft</>
                     : <>{bg.price.toLocaleString('hu-HU')} Ft</>
@@ -273,12 +283,14 @@ export default function BurgerRoster() {
         <button
           onClick={() => goTo(active - 1)}
           disabled={active === 0}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:border-white/30 disabled:opacity-20"
+          className="flex h-11 w-11 items-center justify-center rounded-full transition disabled:opacity-20"
+          style={{ border: '1px solid rgba(0,0,0,0.15)', background: 'rgba(0,0,0,0.05)', color: '#1C1410' }}
         >←</button>
         <button
           onClick={() => goTo(active + 1)}
           disabled={active === BURGERS.length - 1}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:border-white/30 disabled:opacity-20"
+          className="flex h-11 w-11 items-center justify-center rounded-full transition disabled:opacity-20"
+          style={{ border: '1px solid rgba(0,0,0,0.15)', background: 'rgba(0,0,0,0.05)', color: '#1C1410' }}
         >→</button>
       </div>
 
@@ -291,7 +303,7 @@ export default function BurgerRoster() {
             className="h-2 rounded-full transition-all duration-300"
             style={{
               width: i === active ? 28 : 8,
-              backgroundColor: i === active ? b.accent : 'rgba(255,255,255,0.2)',
+              backgroundColor: i === active ? b.accent : 'rgba(0,0,0,0.15)',
             }}
           />
         ))}
