@@ -35,12 +35,16 @@ export default function VideoHero() {
     const canvas = canvasRef.current;
     if (!canvas) return () => revealObs.disconnect();
 
-    // DPR-aware canvas resize
+    // DPR-aware canvas resize — explicit px size so Android doesn't stretch
     function resize() {
       if (!canvas) return;
       const dpr = window.devicePixelRatio || 1;
-      canvas.width  = window.innerWidth  * dpr;
-      canvas.height = window.innerHeight * dpr;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width        = w * dpr;
+      canvas.height       = h * dpr;
+      canvas.style.width  = w + 'px';
+      canvas.style.height = h + 'px';
       if (lastIdx.current >= 0) draw(lastIdx.current);
     }
     resize();
@@ -72,16 +76,15 @@ export default function VideoHero() {
     });
 
     // Scroll → RAF → draw
+    // Use getBoundingClientRect so iOS sticky positioning is handled correctly
     function tick() {
       rafPending.current = false;
       const section = sectionRef.current;
       if (!section) return;
       const spacerH = section.offsetHeight - window.innerHeight;
       if (spacerH <= 0) return;
-      const progress = Math.min(
-        Math.max((window.scrollY - section.offsetTop) / spacerH, 0),
-        1
-      );
+      const top      = section.getBoundingClientRect().top;
+      const progress = Math.min(Math.max(-top / spacerH, 0), 1);
       const idx = Math.round(progress * (TOTAL - 1));
 
       const bar  = document.getElementById('videoProgress');
@@ -99,15 +102,17 @@ export default function VideoHero() {
       requestAnimationFrame(tick);
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    // iOS Safari: scroll fires on document too
+    window.addEventListener('scroll',   onScroll, { passive: true });
     document.addEventListener('scroll', onScroll, { passive: true });
+    // iOS Safari fires scroll on touchmove during momentum — catch it too
+    window.addEventListener('touchmove', onScroll, { passive: true });
     tick();
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      document.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('scroll',    onScroll);
+      document.removeEventListener('scroll',  onScroll);
+      window.removeEventListener('touchmove', onScroll);
+      window.removeEventListener('resize',    resize);
       revealObs.disconnect();
     };
   }, []);
@@ -117,11 +122,7 @@ export default function VideoHero() {
       <div id="stickyFrame">
         <canvas
           ref={canvasRef}
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            display: 'block',
-          }}
+          style={{ position: 'absolute', top: 0, left: 0, display: 'block' }}
         />
         <div id="gradientOverlay" />
         <div id="heroOverlay" className={heroVisible ? 'visible' : ''}>
