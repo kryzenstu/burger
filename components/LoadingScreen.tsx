@@ -9,16 +9,11 @@ export default function LoadingScreen() {
   const [fading, setFading]   = useState(false);
 
   useEffect(() => {
-    const hide = () => {
+    const timer = setTimeout(() => {
       setFading(true);
       setTimeout(() => setVisible(false), 600);
-    };
-
-    if (document.readyState === 'complete') {
-      setTimeout(hide, 300);
-    } else {
-      window.addEventListener('load', () => setTimeout(hide, 300), { once: true });
-    }
+    }, 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!visible) return null;
