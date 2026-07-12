@@ -16,17 +16,10 @@ export default function VideoHero() {
   const imgs        = useRef<HTMLImageElement[]>([]);
   const lastIdx     = useRef(-1);
   const rafPending  = useRef(false);
-
   const [heroVisible, setHeroVisible] = useState(false);
-  const [mobile, setMobile]           = useState(false);
 
   useEffect(() => {
-    const mob =
-      window.innerWidth < 768 ||
-      window.matchMedia('(pointer: coarse)').matches;
-    setMobile(mob);
-
-    // Reveal observer for content sections below the hero
+    // Reveal observer for content sections below
     const revealObs = new IntersectionObserver(
       (entries) =>
         entries.forEach((e) => {
@@ -38,11 +31,6 @@ export default function VideoHero() {
       { threshold: 0.12 }
     );
     document.querySelectorAll('.reveal').forEach((el) => revealObs.observe(el));
-
-    if (mob) {
-      setHeroVisible(true);
-      return () => revealObs.disconnect();
-    }
 
     const canvas = canvasRef.current;
     if (!canvas) return () => revealObs.disconnect();
@@ -75,11 +63,11 @@ export default function VideoHero() {
       lastIdx.current = idx;
     }
 
-    // Preload all frames — only on desktop (i+1 = 1..240)
+    // Preload all frames
     imgs.current = Array.from({ length: TOTAL }, (_, i) => {
       const img = new Image();
       img.src = frameUrl(i + 1);
-      if (i === 0) img.onload = () => draw(0); // first frame ASAP
+      if (i === 0) img.onload = () => draw(0);
       return img;
     });
 
@@ -98,7 +86,7 @@ export default function VideoHero() {
 
       const bar  = document.getElementById('videoProgress');
       const hint = document.getElementById('scrollHint');
-      if (bar)  bar.style.width   = progress * 100 + '%';
+      if (bar)  bar.style.width    = progress * 100 + '%';
       if (hint) hint.style.opacity = progress > 0.03 ? '0' : '1';
 
       setHeroVisible(progress >= 0.85);
@@ -112,108 +100,18 @@ export default function VideoHero() {
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
+    // iOS Safari: scroll fires on document too
+    document.addEventListener('scroll', onScroll, { passive: true });
     tick();
 
     return () => {
       window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', resize);
       revealObs.disconnect();
     };
   }, []);
 
-  // Hero content shared between mobile and desktop
-  const heroContent = (
-    <>
-      <div id="gradientOverlay" />
-      <div id="heroOverlay" className={heroVisible ? 'visible' : ''}>
-        <div style={{ marginBottom: 24 }}>
-          <div id="heroBadge" style={{
-            display: 'inline-block',
-            border: '2px solid rgba(255,200,60,.75)',
-            padding: '8px 28px',
-            letterSpacing: 6,
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: 16,
-            color: 'rgba(255,200,60,.95)',
-            textTransform: 'uppercase',
-          }}>
-            Est. 2024 • Budapest
-          </div>
-        </div>
-        <h1 style={{
-          fontFamily: "'Anton', sans-serif",
-          fontSize: 'clamp(64px,12vw,160px)',
-          color: '#fff',
-          margin: 0,
-          lineHeight: 0.9,
-          textTransform: 'uppercase',
-          letterSpacing: -2,
-          textShadow: '0 4px 40px rgba(0,0,0,.8)',
-        }}>
-          Smoke<br />&amp; Grill
-        </h1>
-        <div style={{ width: 80, height: 3, background: '#FF4500', margin: '28px auto' }} />
-        <p style={{
-          fontFamily: "'Libre Baskerville', serif",
-          fontSize: 'clamp(15px,2vw,22px)',
-          color: 'rgba(255,255,255,.9)',
-          maxWidth: 500,
-          margin: '0 auto 36px',
-          lineHeight: 1.6,
-          fontStyle: 'italic',
-          textShadow: '0 2px 12px rgba(0,0,0,.6)',
-        }}>
-          {h.tagline}
-        </p>
-        <a href="#scrollContainer" style={{
-          fontFamily: "'Bebas Neue', sans-serif",
-          fontSize: 18,
-          letterSpacing: 4,
-          color: '#fff',
-          background: '#FF4500',
-          padding: '16px 44px',
-          textDecoration: 'none',
-        }}>
-          {h.discover}
-        </a>
-      </div>
-      <div id="scrollHint">
-        <div style={{
-          fontFamily: "'Bebas Neue', sans-serif",
-          fontSize: 14,
-          color: 'rgba(255,255,255,.65)',
-          letterSpacing: 4,
-        }}>{h.scroll}</div>
-        <div style={{
-          color: 'rgba(255,255,255,.45)',
-          fontSize: 24,
-          marginTop: 8,
-          animation: 'pulseGlow 2s ease-in-out infinite',
-        }}>↓</div>
-      </div>
-      <div id="videoProgress" />
-    </>
-  );
-
-  // Mobile: single static frame, text immediately visible
-  if (mobile) {
-    return (
-      <div style={{ position: 'relative', height: '100dvh', overflow: 'hidden' }}>
-        <img
-          src={frameUrl(1)}
-          alt=""
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            objectFit: 'cover',
-          }}
-        />
-        {heroContent}
-      </div>
-    );
-  }
-
-  // Desktop: canvas-driven frame animation
   return (
     <div ref={sectionRef} id="videoSection">
       <div id="stickyFrame">
@@ -225,7 +123,74 @@ export default function VideoHero() {
             display: 'block',
           }}
         />
-        {heroContent}
+        <div id="gradientOverlay" />
+        <div id="heroOverlay" className={heroVisible ? 'visible' : ''}>
+          <div style={{ marginBottom: 24 }}>
+            <div id="heroBadge" style={{
+              display: 'inline-block',
+              border: '2px solid rgba(255,200,60,.75)',
+              padding: '8px 28px',
+              letterSpacing: 6,
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: 16,
+              color: 'rgba(255,200,60,.95)',
+              textTransform: 'uppercase',
+            }}>
+              Est. 2024 • Budapest
+            </div>
+          </div>
+          <h1 style={{
+            fontFamily: "'Anton', sans-serif",
+            fontSize: 'clamp(64px,12vw,160px)',
+            color: '#fff',
+            margin: 0,
+            lineHeight: 0.9,
+            textTransform: 'uppercase',
+            letterSpacing: -2,
+            textShadow: '0 4px 40px rgba(0,0,0,.8)',
+          }}>
+            Smoke<br />&amp; Grill
+          </h1>
+          <div style={{ width: 80, height: 3, background: '#FF4500', margin: '28px auto' }} />
+          <p style={{
+            fontFamily: "'Libre Baskerville', serif",
+            fontSize: 'clamp(15px,2vw,22px)',
+            color: 'rgba(255,255,255,.9)',
+            maxWidth: 500,
+            margin: '0 auto 36px',
+            lineHeight: 1.6,
+            fontStyle: 'italic',
+            textShadow: '0 2px 12px rgba(0,0,0,.6)',
+          }}>
+            {h.tagline}
+          </p>
+          <a href="#scrollContainer" style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: 18,
+            letterSpacing: 4,
+            color: '#fff',
+            background: '#FF4500',
+            padding: '16px 44px',
+            textDecoration: 'none',
+          }}>
+            {h.discover}
+          </a>
+        </div>
+        <div id="scrollHint">
+          <div style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: 14,
+            color: 'rgba(255,255,255,.65)',
+            letterSpacing: 4,
+          }}>{h.scroll}</div>
+          <div style={{
+            color: 'rgba(255,255,255,.45)',
+            fontSize: 24,
+            marginTop: 8,
+            animation: 'pulseGlow 2s ease-in-out infinite',
+          }}>↓</div>
+        </div>
+        <div id="videoProgress" />
       </div>
       <div id="videoSpacer" />
     </div>
