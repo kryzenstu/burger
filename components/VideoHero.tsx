@@ -35,38 +35,47 @@ export default function VideoHero() {
     const canvas = canvasRef.current;
     if (!canvas) return () => revealObs.disconnect();
 
-    // Resize: buffer = CSS display size, no DPR scaling to avoid stretch
-    function resize() {
-      if (!canvas) return;
-      canvas.width  = canvas.offsetWidth  || window.innerWidth;
-      canvas.height = canvas.offsetHeight || window.innerHeight;
-      if (lastIdx.current >= 0) draw(lastIdx.current);
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    // Draw one frame with object-fit: cover behaviour
+    // Draw one frame — cover crop, centered, clean before each frame
     function draw(idx: number) {
       if (!canvas) return;
+      const cw = canvas.width, ch = canvas.height;
+      if (!cw || !ch) return;
       const img = imgs.current[idx];
       if (!img?.complete || !img.naturalWidth) return;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
-      const cw = canvas.width, ch = canvas.height;
-      const iw = img.naturalWidth,  ih = img.naturalHeight;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
       const s  = Math.max(cw / iw, ch / ih);
-      ctx.drawImage(img,
-        (cw - iw * s) / 2, (ch - ih * s) / 2,
-        iw * s, ih * s
-      );
+      const dw = Math.round(iw * s);
+      const dh = Math.round(ih * s);
+      const dx = Math.round((cw - dw) / 2);
+      const dy = Math.round((ch - dh) / 2);
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(img, dx, dy, dw, dh);
       lastIdx.current = idx;
     }
+
+    // Resize: use offsetWidth/Height after layout — RAF ensures DOM is ready
+    function resize() {
+      if (!canvas) return;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      if (!w || !h) return;
+      canvas.width  = w;
+      canvas.height = h;
+      if (lastIdx.current >= 0) draw(lastIdx.current);
+    }
+    // Wait one frame so the canvas has been laid out before reading its size
+    requestAnimationFrame(() => {
+      resize();
+      window.addEventListener('resize', resize);
+    });
 
     // Preload all frames
     imgs.current = Array.from({ length: TOTAL }, (_, i) => {
       const img = new Image();
       img.src = frameUrl(i + 1);
-      if (i === 0) img.onload = () => draw(0);
+      if (i === 0) img.onload = () => { resize(); draw(0); };
       return img;
     });
 
@@ -107,7 +116,7 @@ export default function VideoHero() {
       window.removeEventListener('scroll',    onScroll);
       document.removeEventListener('scroll',  onScroll);
       window.removeEventListener('touchmove', onScroll);
-      window.removeEventListener('resize',    resize);
+      window.removeEventListener('resize',    resize); // safe even if not added yet
       revealObs.disconnect();
     };
   }, []);
