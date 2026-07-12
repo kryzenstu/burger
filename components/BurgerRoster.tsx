@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import gsap from 'gsap';
 
 type Burger = {
@@ -62,190 +62,239 @@ const BURGERS: Burger[] = [
   },
 ];
 
+// 74 % of viewport per slide → 13 % peek on each side
+const SLIDE_VW = 74;
+const PEEK_VW  = (100 - SLIDE_VW) / 2; // 13
+
 export default function BurgerRoster() {
   const [active, setActive] = useState(0);
-  const prev = useRef(0);
   const b = BURGERS[active];
 
-  const imgRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-  const nameRef = useRef<HTMLDivElement>(null);
-  const priceRef = useRef<HTMLSpanElement>(null);
-  const barsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const trackRef  = useRef<HTMLDivElement>(null);
+  const statsRef  = useRef<HTMLDivElement>(null);
+  const priceRef  = useRef<HTMLSpanElement>(null);
 
-  useLayoutEffect(() => {
-    const dir = active >= prev.current ? 1 : -1;
-    prev.current = active;
+  // Navigate by setting scrollLeft to i × slideWidth
+  const goTo = useCallback((i: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const sw = window.innerWidth * (SLIDE_VW / 100);
+    track.scrollTo({ left: i * sw, behavior: 'smooth' });
+  }, []);
 
+  // Detect active slide from scroll position
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const onScroll = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const sw = window.innerWidth * (SLIDE_VW / 100);
+        const idx = Math.round(track.scrollLeft / sw);
+        setActive(Math.max(0, Math.min(BURGERS.length - 1, idx)));
+      }, 60); // debounce — fires after scrolling settles
+    };
+
+    track.addEventListener('scroll', onScroll, { passive: true });
+    return () => { track.removeEventListener('scroll', onScroll); clearTimeout(timer); };
+  }, []);
+
+  // GSAP: segments + price counter on active change
+  useEffect(() => {
+    if (!statsRef.current) return;
+    const container = statsRef.current;
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
-
-      tl.fromTo(
-        imgRef.current,
-        {
-          x: dir * 260,
-          y: -40,
-          rotate: dir * 18,
-          scale: 0.8,
-          opacity: 0,
-          transformOrigin: '50% -60%',
-        },
-        {
-          x: 0,
-          y: 0,
-          rotate: 0,
-          scale: 1,
-          opacity: 1,
-          duration: 1.1,
-          ease: 'elastic.out(1, 0.55)',
-        },
-        0,
-      );
-
-      tl.fromTo(glowRef.current, { opacity: 0 }, { opacity: 0.6, duration: 0.5 }, 0.1);
-      tl.fromTo(
-        nameRef.current,
-        { opacity: 0, x: dir * 30 },
-        { opacity: 1, x: 0, duration: 0.45, ease: 'power3.out' },
-        0.05,
-      );
-
-      barsRef.current.forEach((el, i) => {
-        if (!el) return;
-        tl.fromTo(
-          el,
-          { width: '0%' },
-          { width: `${b.stats[i].value}%`, duration: 0.6, ease: 'power3.out' },
-          0.15 + i * 0.07,
-        );
+      b.stats.forEach((s, i) => {
+        const segs = container.querySelectorAll<HTMLElement>(`[data-row="${i}"] [data-seg]`);
+        const filled = Math.round(s.value / 10);
+        gsap.set(segs, { opacity: 0, scaleY: 0, transformOrigin: 'bottom' });
+        gsap.to(Array.from(segs).slice(0, filled), {
+          opacity: 1, scaleY: 1, duration: 0.18, stagger: 0.055,
+          delay: 0.28 + i * 0.12, ease: 'back.out(1.4)',
+        });
+        gsap.to(Array.from(segs).slice(filled), {
+          opacity: 1, scaleY: 1, duration: 0.1, delay: 0.28 + i * 0.12,
+        });
       });
-
       const counter = { v: 0 };
-      tl.to(
-        counter,
-        {
-          v: b.price,
-          duration: 0.5,
-          onUpdate: () => {
-            if (priceRef.current)
-              priceRef.current.textContent = Math.round(counter.v).toLocaleString('hu-HU');
-          },
+      gsap.to(counter, {
+        v: b.price, duration: 0.45, delay: 0.25,
+        onUpdate: () => {
+          if (priceRef.current)
+            priceRef.current.textContent = Math.round(counter.v).toLocaleString('hu-HU');
         },
-        0.1,
-      );
-    });
+      });
+    }, container);
     return () => ctx.revert();
   }, [active, b]);
 
   return (
-    <section className="relative overflow-hidden bg-[#0d0b0a] px-6 py-24">
-      <div className="mx-auto max-w-6xl">
+    <section className="relative bg-[#0d0b0a] py-24">
+      {/* Header */}
+      <div className="px-6 text-center">
         <p
-          className="mb-2 text-center text-xs font-semibold tracking-[0.35em] transition-colors duration-500"
+          className="mb-2 text-xs font-semibold tracking-[0.35em] transition-colors duration-500"
           style={{ color: b.accent }}
         >
           VÁLASZD KI A TIÉD
         </p>
-        <h2 className="mb-16 text-center text-4xl font-bold tracking-tight text-white md:text-5xl">
+        <h2 className="mb-12 text-4xl font-bold tracking-tight text-white md:text-5xl">
           A mi burgereink
         </h2>
+      </div>
 
-        <div className="grid items-center gap-12 md:grid-cols-2">
-          <div className="relative flex min-h-[420px] items-center justify-center">
+      {/* ── Carousel track ──
+          overflow-x: scroll handles its OWN overflow so parent
+          overflow-x: hidden can't clip the peeking adjacent slides.
+          padding creates the 13 vw peek space on each side.
+          scroll-snap snaps to each slide start.                    */}
+      <div
+        ref={trackRef}
+        className="burger-track flex"
+        style={{
+          overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
+          scrollbarWidth: 'none',        // Firefox
+          WebkitOverflowScrolling: 'touch',
+          paddingLeft:  `${PEEK_VW}vw`,
+          paddingRight: `${PEEK_VW}vw`,
+          scrollPaddingInlineStart: `${PEEK_VW}vw`,
+        }}
+      >
+        {BURGERS.map((bg, idx) => {
+          const isActive = idx === active;
+          return (
             <div
-              ref={glowRef}
-              className="pointer-events-none absolute h-[360px] w-[360px] rounded-full"
+              key={bg.id}
               style={{
-                background: `radial-gradient(circle, ${b.accent}55 0%, transparent 65%)`,
-                filter: 'blur(30px)',
+                flex: `0 0 ${SLIDE_VW}vw`,
+                width: `${SLIDE_VW}vw`,
+                scrollSnapAlign: 'start',
+                opacity: isActive ? 1 : 0.4,
+                transform: isActive ? 'scale(1)' : 'scale(0.9)',
+                transformOrigin: 'top center',
+                transition: 'opacity 0.4s ease, transform 0.4s ease',
+                cursor: isActive ? 'default' : 'pointer',
               }}
-            />
-            <div ref={imgRef} className="relative">
-              <img
-                src={b.img}
-                alt={b.name}
-                className="h-[340px] w-[340px] object-contain md:h-[420px] md:w-[420px]"
-              />
-            </div>
-          </div>
-
-          <div>
-            <div ref={nameRef}>
-              <p className="text-sm italic tracking-wide" style={{ color: b.accent }}>
-                {b.sub}
+              className="flex flex-col items-center pb-4 text-center"
+              onClick={() => { if (!isActive) goTo(idx); }}
+            >
+              {/* Name + subtitle */}
+              <p className="text-sm italic tracking-wide" style={{ color: bg.accent }}>
+                {bg.sub}
               </p>
-              <h3 className="mt-1 text-4xl font-bold text-white md:text-5xl">{b.name}</h3>
-              <p className="mt-4 max-w-md text-white/55">{b.tag}</p>
-            </div>
+              <h3 className="mt-1 text-3xl font-bold text-white md:text-4xl">{bg.name}</h3>
+              <p className="mt-2 max-w-sm text-sm text-white/50">{bg.tag}</p>
 
-            <div className="mt-8 space-y-4">
-              {b.stats.map((s, i) => (
-                <div key={s.label}>
-                  <div className="mb-1 flex justify-between text-xs font-medium uppercase tracking-wider text-white/60">
-                    <span>{s.label}</span>
-                    <span>{s.value}</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                    <div
-                      ref={(el) => {
-                        barsRef.current[i] = el;
-                      }}
-                      className="h-full rounded-full"
-                      style={{ width: 0, backgroundColor: b.accent }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 flex items-center gap-5">
-              <div className="text-3xl font-bold text-white">
-                <span ref={priceRef}>{b.price.toLocaleString('hu-HU')}</span> Ft
-              </div>
-              <button
-                className="rounded-full px-6 py-3 text-sm font-semibold text-black transition-transform hover:scale-105"
-                style={{ backgroundColor: b.accent }}
-              >
-                Ezt kérem
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-16 flex justify-center gap-4">
-          {BURGERS.map((bg, i) => {
-            const on = i === active;
-            return (
-              <button
-                key={bg.id}
-                onClick={() => setActive(i)}
-                className="flex shrink-0 flex-col items-center gap-2 outline-none"
-              >
+              {/* Large burger image */}
+              <div className="relative mt-5 flex items-center justify-center">
                 <div
-                  className="flex h-24 w-24 items-center justify-center rounded-2xl border transition-all duration-300"
+                  className="pointer-events-none absolute rounded-full"
                   style={{
-                    borderColor: on ? bg.accent : 'rgba(255,255,255,0.08)',
-                    backgroundColor: on ? `${bg.accent}18` : 'rgba(255,255,255,0.03)',
-                    boxShadow: on ? `0 0 24px ${bg.accent}40` : 'none',
+                    width: 300, height: 300,
+                    background: `radial-gradient(circle, ${bg.accent}50 0%, transparent 68%)`,
+                    filter: 'blur(36px)',
                   }}
-                >
-                  <img
-                    src={bg.img}
-                    alt={bg.name}
-                    className="h-16 w-16 object-contain transition-all duration-300"
-                    style={{ filter: on ? 'none' : 'grayscale(0.7)', opacity: on ? 1 : 0.5 }}
-                  />
+                />
+                <img
+                  src={bg.img}
+                  alt={bg.name}
+                  className="relative object-contain"
+                  style={{ width: 'clamp(200px, 30vw, 360px)', height: 'clamp(200px, 30vw, 360px)' }}
+                />
+              </div>
+
+              {/* Compact 2×2 stat grid */}
+              <div
+                ref={isActive ? statsRef : undefined}
+                className="mt-7 grid w-full max-w-sm grid-cols-2 gap-x-5 gap-y-4"
+              >
+                {bg.stats.map((s, i) => {
+                  const filledCount = Math.round(s.value / 10);
+                  return (
+                    <div key={s.label} data-row={i} className="text-left">
+                      <div className="mb-1.5 flex items-baseline justify-between">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
+                          {s.label}
+                        </span>
+                        <span className="text-[10px] font-bold tabular-nums" style={{ color: bg.accent }}>
+                          {s.value}
+                        </span>
+                      </div>
+                      <div className="flex gap-[2px]">
+                        {Array.from({ length: 10 }, (_, j) => {
+                          const on = j < filledCount;
+                          return (
+                            <div
+                              key={j}
+                              data-seg={j}
+                              style={{
+                                flex: 1,
+                                height: j % 2 === 0 ? 10 : 7,
+                                borderRadius: 2,
+                                backgroundColor: on ? bg.accent : 'rgba(255,255,255,0.06)',
+                                boxShadow: on ? `0 0 6px ${bg.accent}60` : 'none',
+                                opacity: 0,
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Price + CTA */}
+              <div className="mt-7 flex items-center gap-5">
+                <div className="text-3xl font-bold text-white">
+                  {isActive
+                    ? <><span ref={priceRef}>{bg.price.toLocaleString('hu-HU')}</span> Ft</>
+                    : <>{bg.price.toLocaleString('hu-HU')} Ft</>
+                  }
                 </div>
-                <span
-                  className="text-xs font-medium"
-                  style={{ color: on ? '#fff' : 'rgba(255,255,255,0.4)' }}
+                <button
+                  className="rounded-full px-7 py-3 text-sm font-semibold text-black transition-transform hover:scale-105"
+                  style={{ backgroundColor: bg.accent }}
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  {bg.name}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                  Ezt kérem
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Arrow buttons */}
+      <div className="mt-6 flex justify-center gap-4">
+        <button
+          onClick={() => goTo(active - 1)}
+          disabled={active === 0}
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:border-white/30 disabled:opacity-20"
+        >←</button>
+        <button
+          onClick={() => goTo(active + 1)}
+          disabled={active === BURGERS.length - 1}
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:border-white/30 disabled:opacity-20"
+        >→</button>
+      </div>
+
+      {/* Dot indicators */}
+      <div className="mt-5 flex justify-center gap-3">
+        {BURGERS.map((bg, i) => (
+          <button
+            key={bg.id}
+            onClick={() => goTo(i)}
+            className="h-2 rounded-full transition-all duration-300"
+            style={{
+              width: i === active ? 28 : 8,
+              backgroundColor: i === active ? b.accent : 'rgba(255,255,255,0.2)',
+            }}
+          />
+        ))}
       </div>
     </section>
   );

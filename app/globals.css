@@ -18,6 +18,9 @@ body {
 
 #scrollContainer { overflow-x: hidden; }
 
+/* Burger carousel — hide native scrollbar */
+.burger-track::-webkit-scrollbar { display: none; }
+
 @keyframes pulseGlow {
   0%, 100% { opacity: 0.45; }
   50%       { opacity: 0.9; }
