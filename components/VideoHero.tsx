@@ -5,7 +5,7 @@ import { useLang } from '@/components/LangContext';
 
 const TOTAL = 240;
 const frameUrl = (i: number) =>
-  `/frames/frame_${String(i + 1).padStart(4, '0')}.jpg`;
+  `/frames/frame_${String(i).padStart(4, '0')}.jpg`;
 
 export default function VideoHero() {
   const { t } = useLang();
@@ -75,10 +75,10 @@ export default function VideoHero() {
       lastIdx.current = idx;
     }
 
-    // Preload all frames — only on desktop
+    // Preload all frames — only on desktop (i+1 = 1..240)
     imgs.current = Array.from({ length: TOTAL }, (_, i) => {
       const img = new Image();
-      img.src = frameUrl(i);
+      img.src = frameUrl(i + 1);
       if (i === 0) img.onload = () => draw(0); // first frame ASAP
       return img;
     });
@@ -200,7 +200,7 @@ export default function VideoHero() {
     return (
       <div style={{ position: 'relative', height: '100dvh', overflow: 'hidden' }}>
         <img
-          src={frameUrl(0)}
+          src={frameUrl(1)}
           alt=""
           style={{
             position: 'absolute', inset: 0,
