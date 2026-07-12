@@ -35,16 +35,11 @@ export default function VideoHero() {
     const canvas = canvasRef.current;
     if (!canvas) return () => revealObs.disconnect();
 
-    // DPR-aware canvas resize — explicit px size so Android doesn't stretch
+    // Resize: buffer = CSS display size, no DPR scaling to avoid stretch
     function resize() {
       if (!canvas) return;
-      const dpr = window.devicePixelRatio || 1;
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      canvas.width        = w * dpr;
-      canvas.height       = h * dpr;
-      canvas.style.width  = w + 'px';
-      canvas.style.height = h + 'px';
+      canvas.width  = canvas.offsetWidth  || window.innerWidth;
+      canvas.height = canvas.offsetHeight || window.innerHeight;
       if (lastIdx.current >= 0) draw(lastIdx.current);
     }
     resize();
@@ -122,7 +117,7 @@ export default function VideoHero() {
       <div id="stickyFrame">
         <canvas
           ref={canvasRef}
-          style={{ position: 'absolute', top: 0, left: 0, display: 'block' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}
         />
         <div id="gradientOverlay" />
         <div id="heroOverlay" className={heroVisible ? 'visible' : ''}>
