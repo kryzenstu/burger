@@ -131,7 +131,7 @@ export default function BurgerRoster() {
   }, [active, b]);
 
   return (
-    <section className="relative py-24" style={{ background: '#EDE7DB' }}>
+    <section className="relative py-24" style={{ background: '#E5DDD0' }}>
       {/* Header */}
       <div className="px-6 text-center">
         <p

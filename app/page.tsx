@@ -8,8 +8,8 @@ const FONT = {
 };
 
 const C = {
-  bg1:    '#EDE7DB',   // egységes cream
-  bg2:    '#EDE7DB',   // egységes cream
+  bg1:    '#E5DDD0',   // egységes cream
+  bg2:    '#E5DDD0',   // egységes cream
   bg3:    '#1C1410',   // sötét footer/CTA
   text:   '#1C1410',   // majdnem fekete
   muted:  '#7A6A58',   // közepes barna
