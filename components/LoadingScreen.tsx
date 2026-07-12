@@ -1,0 +1,61 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
+export default function LoadingScreen() {
+  const [visible, setVisible] = useState(true);
+  const [fading, setFading]   = useState(false);
+
+  useEffect(() => {
+    const hide = () => {
+      setFading(true);
+      setTimeout(() => setVisible(false), 600);
+    };
+
+    if (document.readyState === 'complete') {
+      setTimeout(hide, 300);
+    } else {
+      window.addEventListener('load', () => setTimeout(hide, 300), { once: true });
+    }
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: '#E5DDD0',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      gap: 24,
+      opacity: fading ? 0 : 1,
+      transition: 'opacity 0.6s ease',
+      pointerEvents: fading ? 'none' : 'auto',
+    }}>
+      <img
+        src="/burgers/classic.webp"
+        alt=""
+        style={{
+          width: 140, height: 140,
+          objectFit: 'contain',
+          animation: 'burgerSpin 1.2s linear infinite',
+        }}
+      />
+      <p style={{
+        fontFamily: "'Bebas Neue', sans-serif",
+        fontSize: 18,
+        letterSpacing: 6,
+        color: '#7A6A58',
+        margin: 0,
+      }}>
+        BETÖLTÉS...
+      </p>
+
+      <style>{`
+        @keyframes burgerSpin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
