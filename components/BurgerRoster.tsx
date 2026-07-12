@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import gsap from 'gsap';
+import { useLang } from '@/components/LangContext';
 
 type Burger = {
   id: string;
@@ -67,6 +68,8 @@ const SLIDE_VW = 74;
 const PEEK_VW  = (100 - SLIDE_VW) / 2; // 13
 
 export default function BurgerRoster() {
+  const { t } = useLang();
+  const r = t.roster;
   const [active, setActive] = useState(0);
   const b = BURGERS[active];
 
@@ -138,10 +141,10 @@ export default function BurgerRoster() {
           className="mb-2 text-xs font-semibold tracking-[0.35em] transition-colors duration-500"
           style={{ color: b.accent }}
         >
-          VÁLASZD KI A TIÉD
+          {r.label}
         </p>
         <h2 className="mb-12 text-4xl font-bold tracking-tight md:text-5xl" style={{ color: '#1C1410' }}>
-          A mi burgereink
+          {r.title}
         </h2>
       </div>
 
@@ -227,7 +230,7 @@ export default function BurgerRoster() {
                     <div key={s.label} data-row={i} className="text-left">
                       <div className="mb-1.5 flex items-baseline justify-between">
                         <span className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: '#7A6A58' }}>
-                          {s.label}
+                          {r.statLabels[i] ?? s.label}
                         </span>
                         <span className="text-[10px] font-bold tabular-nums" style={{ color: bg.accent }}>
                           {s.value}
@@ -270,7 +273,7 @@ export default function BurgerRoster() {
                   style={{ backgroundColor: bg.accent }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  Ezt kérem
+                  {r.cta}
                 </button>
               </div>
             </div>

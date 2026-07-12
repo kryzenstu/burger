@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLang } from '@/components/LangContext';
 
 export default function LoadingScreen() {
+  const { t } = useLang();
   const [visible, setVisible] = useState(true);
   const [fading, setFading]   = useState(false);
 
@@ -47,7 +49,7 @@ export default function LoadingScreen() {
         color: '#7A6A58',
         margin: 0,
       }}>
-        BETÖLTÉS...
+        {t.loading}
       </p>
 
       <style>{`

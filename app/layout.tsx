@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { LangProvider } from '@/components/LangContext';
 import LoadingScreen from '@/components/LoadingScreen';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export const metadata: Metadata = {
   title: 'Smoke & Grill — Budapest',
@@ -19,8 +21,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <LoadingScreen />
-        {children}
+        <LangProvider>
+          <LoadingScreen />
+          <LanguageSwitcher />
+          {children}
+        </LangProvider>
       </body>
     </html>
   );
