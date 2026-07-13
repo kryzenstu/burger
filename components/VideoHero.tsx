@@ -140,8 +140,8 @@ export default function VideoHero() {
       style={{
         position: 'fixed',
         bottom: 32,
-        left: '50%',
-        transform: `translateX(-50%) translateY(${inHero ? '0' : '80px'})`,
+        right: 40,
+        transform: `translateY(${inHero ? '0' : '80px'})`,
         zIndex: 500,
         opacity: inHero ? 1 : 0,
         pointerEvents: inHero ? 'auto' : 'none',
