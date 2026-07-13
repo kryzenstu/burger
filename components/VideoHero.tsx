@@ -152,6 +152,7 @@ export default function VideoHero() {
         padding: '14px 40px',
         cursor: 'pointer',
         boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+        whiteSpace: 'nowrap',
       }}
     >
       {h.order}
