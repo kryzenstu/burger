@@ -137,15 +137,12 @@ export default function VideoHero() {
     {/* Fix gomb — csak hero scroll közben látható */}
     <button
       onClick={scrollToBurgers}
+      className="order-btn"
+      data-visible={inHero}
       style={{
         position: 'fixed',
         bottom: 32,
-        right: 40,
-        transform: `translateY(${inHero ? '0' : '80px'})`,
         zIndex: 500,
-        opacity: inHero ? 1 : 0,
-        pointerEvents: inHero ? 'auto' : 'none',
-        transition: 'opacity 0.35s ease, transform 0.35s ease',
         fontFamily: "'Bebas Neue', sans-serif",
         fontSize: 16,
         letterSpacing: 5,

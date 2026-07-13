@@ -110,6 +110,30 @@ body {
   }
 }
 
+/* ── Order button ── */
+.order-btn {
+  right: 40px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: auto;
+}
+.order-btn[data-visible="false"] {
+  opacity: 0;
+  transform: translateY(80px);
+  pointer-events: none;
+}
+@media (max-width: 767px) {
+  .order-btn {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+  }
+  .order-btn[data-visible="false"] {
+    transform: translateX(-50%) translateY(80px);
+  }
+}
+
 /* ── Mobile / iPhone optimizations ── */
 @media (max-width: 767px) {
   #stickyFrame { height: 62vh; height: 62dvh; }
