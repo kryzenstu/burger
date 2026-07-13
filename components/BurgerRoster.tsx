@@ -141,7 +141,7 @@ export default function BurgerRoster() {
   }, [active, b, isEur]);
 
   return (
-    <section className="relative py-24" style={{ background: '#E5DDD0' }}>
+    <section id="burger-roster" className="relative py-24" style={{ background: '#E5DDD0' }}>
       {/* Header */}
       <div className="px-6 text-center">
         <p

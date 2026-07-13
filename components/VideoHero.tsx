@@ -17,6 +17,7 @@ export default function VideoHero() {
   const lastIdx     = useRef(-1);
   const rafPending  = useRef(false);
   const [heroVisible, setHeroVisible] = useState(false);
+  const [inHero, setInHero]           = useState(true);
 
   useEffect(() => {
     // Reveal observer for content sections below
@@ -97,6 +98,7 @@ export default function VideoHero() {
       if (hint) hint.style.opacity = progress > 0.03 ? '0' : '1';
 
       setHeroVisible(progress >= 0.85);
+      setInHero(progress < 1);
       if (idx !== lastIdx.current) draw(idx);
     }
 
@@ -121,7 +123,43 @@ export default function VideoHero() {
     };
   }, []);
 
+  function scrollToBurgers() {
+    const el = document.getElementById('burger-roster');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      document.getElementById('scrollContainer')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
   return (
+    <>
+    {/* Fix gomb — csak hero scroll közben látható */}
+    <button
+      onClick={scrollToBurgers}
+      style={{
+        position: 'fixed',
+        bottom: 32,
+        left: '50%',
+        transform: `translateX(-50%) translateY(${inHero ? '0' : '80px'})`,
+        zIndex: 500,
+        opacity: inHero ? 1 : 0,
+        pointerEvents: inHero ? 'auto' : 'none',
+        transition: 'opacity 0.35s ease, transform 0.35s ease',
+        fontFamily: "'Bebas Neue', sans-serif",
+        fontSize: 16,
+        letterSpacing: 5,
+        color: '#fff',
+        background: '#C8410A',
+        border: 'none',
+        padding: '14px 40px',
+        cursor: 'pointer',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+      }}
+    >
+      RENDELÉS ↓
+    </button>
+
     <div ref={sectionRef} id="videoSection">
       <div id="stickyFrame">
         <canvas
@@ -199,5 +237,6 @@ export default function VideoHero() {
       </div>
       <div id="videoSpacer" />
     </div>
+    </>
   );
 }
