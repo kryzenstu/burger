@@ -7,6 +7,7 @@ export const translations = {
       tagline: 'Kézműves hamburgerek, füstölt ízek, amerikai lélek.',
       discover: 'FEDEZD FEL ↓',
       scroll: 'Görgess lefelé',
+      order: 'RENDELÉS ↓',
     },
     story: {
       label: 'A SZTORI',
@@ -54,6 +55,7 @@ export const translations = {
       tagline: 'Craft burgers, smoky flavours, American soul.',
       discover: 'DISCOVER ↓',
       scroll: 'Scroll down',
+      order: 'ORDER ↓',
     },
     story: {
       label: 'THE STORY',
@@ -101,6 +103,7 @@ export const translations = {
       tagline: 'Handgemachte Burger, rauchige Aromen, amerikanische Seele.',
       discover: 'ENTDECKEN ↓',
       scroll: 'Nach unten scrollen',
+      order: 'BESTELLEN ↓',
     },
     story: {
       label: 'DIE GESCHICHTE',
@@ -148,6 +151,7 @@ export const translations = {
       tagline: 'Ambachtelijke burgers, rokerige smaken, Amerikaanse ziel.',
       discover: 'ONTDEKKEN ↓',
       scroll: 'Scroll naar beneden',
+      order: 'BESTELLEN ↓',
     },
     story: {
       label: 'HET VERHAAL',

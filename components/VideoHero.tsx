@@ -157,7 +157,7 @@ export default function VideoHero() {
         boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
       }}
     >
-      RENDELÉS ↓
+      {h.order}
     </button>
 
     <div ref={sectionRef} id="videoSection">
